@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int     @id
+  username String?
+  is_admin Boolean @default(false)
+}
+
+model Group {
+  id      Int    @id @default(autoincrement())
+  chat_id BigInt @unique
+  title   String
+}
+
+model GroupSet {
+  id    Int             @id @default(autoincrement())
+  name  String          @unique
+  items GroupSetItem[]
+}
+
+model GroupSetItem {
+  id      Int      @id @default(autoincrement())
+  set     GroupSet @relation(fields: [setId], references: [id])
+  setId   Int
+  chat_id BigInt
+}
+
+model Broadcast {
+  id        Int                 @id @default(autoincrement())
+  text      String
+  created_at DateTime           @default(now())
+  updated_at DateTime           @updatedAt
+  messages  BroadcastMessage[]
+}
+
+model BroadcastMessage {
+  id          Int       @id @default(autoincrement())
+  broadcast   Broadcast @relation(fields: [broadcastId], references: [id])
+  broadcastId Int
+  chat_id     BigInt
+  message_id  Int
+}
