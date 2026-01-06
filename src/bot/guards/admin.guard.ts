@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma';
+import { MyContext } from '../types';
 
 export class AdminGuard {
   async checkAdmin(userId: number) {
@@ -9,7 +10,7 @@ export class AdminGuard {
   }
 
   middleware() {
-    return async (ctx: any, next: () => Promise<void>) => {
+    return async (ctx: MyContext, next: () => Promise<void>) => {
       if (ctx.from && await this.checkAdmin(ctx.from.id)) {
         await next();
       } else {

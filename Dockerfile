@@ -2,38 +2,36 @@
 FROM node:18-alpine AS builder
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN npm install -g pnpm
-RUN pnpm install --prod
+# Install pnpm globally and then install all dependencies
+RUN npm install -g pnpm && pnpm install
 
 # Copy the rest of the application source code
 COPY . .
 
 # Compile TypeScript
 RUN pnpm exec tsc
-# Generate Prisma Client
-RUN pnpm prisma generate
 
 
 # Stage 2: Production image
 FROM node:18-alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
-# Install production dependencies
-RUN pnpm install --prod
+# Install pnpm globally and then install production dependencies
+RUN npm install -g pnpm && pnpm install --prod
 
-# Copy the compiled code from the builder stage
-COPY --from=builder /usr/src/app/dist ./dist
+# Copy the compiled code and node_modules from the builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 
 # Expose the port the app runs on
 EXPOSE 3000

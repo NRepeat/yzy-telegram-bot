@@ -5,13 +5,13 @@ import { AdminGuard } from './guards/admin.guard';
 import { MyContext } from './types';
 
 export class Bot {
-  private readonly bot: Telegraf<any>;
+  private readonly bot: Telegraf<MyContext>;
   private readonly sceneManager: SceneManager;
   private readonly groupService: GroupService;
   private readonly adminGuard: AdminGuard;
 
   constructor(token: string) {
-    this.bot = new Telegraf<any>(token);
+    this.bot = new Telegraf<MyContext>(token);
     this.sceneManager = new SceneManager(this.bot);
     this.groupService = new GroupService();
     this.adminGuard = new AdminGuard();
@@ -48,7 +48,7 @@ export class Bot {
         ctx.reply('Please provide a valid broadcast ID. Usage: /edit <broadcast_id>');
         return;
       }
-      ctx.scene.session.broadcastId = broadcastId;
+      (ctx.scene.session as any).broadcastId = broadcastId;
       ctx.scene.enter('edit');
     });
     this.bot.command('saveset', (ctx) => ctx.scene.enter('saveset'));

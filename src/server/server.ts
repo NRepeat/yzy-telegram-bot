@@ -1,5 +1,6 @@
 import fastify, { FastifyInstance } from 'fastify';
 import { Bot } from '../bot/bot';
+import { MyContext } from '../bot/types';
 
 export class App {
   private readonly server: FastifyInstance;

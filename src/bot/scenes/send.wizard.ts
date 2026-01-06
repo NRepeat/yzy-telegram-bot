@@ -3,19 +3,19 @@ import { message } from 'telegraf/filters';
 import { GroupService } from '../services/group.service';
 import { GroupSetService } from '../services/groupSet.service';
 import { BroadcastService } from '../services/broadcast.service';
+import { MyContext, MySceneState } from '../types';
 
-const showMenu = async (ctx: any) => {
-    const groupService = ctx.scene.state.groupService as GroupService;
-    const groupSetService = ctx.scene.state.groupSetService as GroupSetService;
+const showMenu = async (ctx: MyContext) => {
+    const { groupService, groupSetService } = ctx.scene.state as MySceneState;
 
-    const groups = await groupService.getGroups();
-    const groupSets = await groupSetService.getGroupSets();
+    const groups = await groupService!.getGroups();
+    const groupSets = await groupSetService!.getGroupSets();
 
-    ctx.scene.session.selected = ctx.scene.session.selected || new Set();
-    ctx.scene.session.activeSets = ctx.scene.session.activeSets || new Set();
+    ctx.scene.session.selected = ctx.scene.session.selected || new Set<string>();
+    ctx.scene.session.activeSets = ctx.scene.session.activeSets || new Set<number>();
 
     const groupButtons = groups.map((group) => {
-      const isSelected = ctx.scene.session.selected.has(group.chat_id.toString());
+      const isSelected = ctx.scene.session.selected!.has(group.chat_id.toString());
       return Markup.button.callback(
         `${isSelected ? '✅' : ''} ${group.title}`,
         `toggle_group_${group.chat_id}`
@@ -23,7 +23,7 @@ const showMenu = async (ctx: any) => {
     });
 
     const groupSetButtons = groupSets.map((set) => {
-      const isActive = ctx.scene.session.activeSets.has(set.id);
+      const isActive = ctx.scene.session.activeSets!.has(set.id);
       return Markup.button.callback(
         `${isActive ? '✅' : ''} ${set.name}`,
         `toggle_set_${set.id}`
@@ -47,26 +47,26 @@ const showMenu = async (ctx: any) => {
     }
 };
 
-const handleMenu = new Scenes.WizardScene(
+export const sendWizard = new Scenes.WizardScene<MyContext>(
     'send',
     // Step 1: Show menu
-    async (ctx: any) => {
+    async (ctx) => {
         await showMenu(ctx);
         return ctx.wizard.next();
     },
     // Step 2: Handle button clicks
-    async (ctx: any) => {
-        if(!ctx.callbackQuery) {
+    async (ctx) => {
+        if(!ctx.callbackQuery || !('data' in ctx.callbackQuery)) {
             return;
         }
         const data = ctx.callbackQuery.data;
 
         if (data.startsWith('toggle_group_')) {
             const chatId = data.replace('toggle_group_', '');
-            if (ctx.scene.session.selected.has(chatId)) {
-                ctx.scene.session.selected.delete(chatId);
+            if (ctx.scene.session.selected!.has(chatId)) {
+                ctx.scene.session.selected!.delete(chatId);
             } else {
-                ctx.scene.session.selected.add(chatId);
+                ctx.scene.session.selected!.add(chatId);
             }
             await showMenu(ctx);
             return;
@@ -74,15 +74,15 @@ const handleMenu = new Scenes.WizardScene(
 
         if (data.startsWith('toggle_set_')) {
             const setId = parseInt(data.replace('toggle_set_', ''));
-            const groupSetService = ctx.scene.state.groupSetService as GroupSetService;
-            const groupSet = await groupSetService.getGroupSets().then(sets => sets.find(s => s.id === setId));
+            const { groupSetService } = ctx.scene.state as MySceneState;
+            const groupSet = await groupSetService!.getGroupSets().then(sets => sets.find(s => s.id === setId));
             if (groupSet) {
-                if (ctx.scene.session.activeSets.has(setId)) {
-                    ctx.scene.session.activeSets.delete(setId);
-                    groupSet.items.forEach(item => ctx.scene.session.selected.delete(item.chat_id.toString()));
+                if (ctx.scene.session.activeSets!.has(setId)) {
+                    ctx.scene.session.activeSets!.delete(setId);
+                    groupSet.items.forEach(item => ctx.scene.session.selected!.delete(item.chat_id.toString()));
                 } else {
-                    ctx.scene.session.activeSets.add(setId);
-                    groupSet.items.forEach(item => ctx.scene.session.selected.add(item.chat_id.toString()));
+                    ctx.scene.session.activeSets!.add(setId);
+                    groupSet.items.forEach(item => ctx.scene.session.selected!.add(item.chat_id.toString()));
                 }
             }
             await showMenu(ctx);
@@ -105,23 +105,23 @@ const handleMenu = new Scenes.WizardScene(
         }
     },
     // Step 3: Ask for message and send
-    async (ctx: any) => {
+    async (ctx) => {
         if (ctx.has(message('text'))) {
-            ctx.scene.session.text = ctx.message.text;
+            ctx.scene.session.text = (ctx.message as { text: string }).text;
             await ctx.reply(`Message "${ctx.scene.session.text}" will be sent to selected groups.`);
-            const broadcastService = ctx.scene.state.broadcastService as BroadcastService;
-            const selectedChatIds = Array.from(ctx.scene.session.selected).map(id => BigInt(id as string));
-            await broadcastService.createBroadcast(ctx.scene.session.text, selectedChatIds);
+            const { broadcastService } = ctx.scene.state as MySceneState;
+            const selectedChatIds = Array.from(ctx.scene.session.selected!).map(id => BigInt(id as string));
+            await broadcastService!.createBroadcast(ctx.scene.session.text, selectedChatIds);
             return ctx.scene.leave();
         }
         ctx.reply('Please enter a text message.');
     },
     // Step 4: Ask for group set name
-    async (ctx: any) => {
+    async (ctx) => {
         if(ctx.has(message('text'))){
-            const groupSetService = ctx.scene.state.groupSetService as GroupSetService;
-            const selectedChatIds = Array.from(ctx.scene.session.selected).map(id => BigInt(id as string));
-            await groupSetService.createGroupSet(ctx.message.text, selectedChatIds);
+            const { groupSetService } = ctx.scene.state as MySceneState;
+            const selectedChatIds = Array.from(ctx.scene.session.selected!).map(id => BigInt(id as string));
+            await groupSetService!.createGroupSet((ctx.message as { text: string }).text, selectedChatIds);
             await ctx.reply('Group set saved.');
             ctx.wizard.selectStep(0);
             return showMenu(ctx);
@@ -129,5 +129,3 @@ const handleMenu = new Scenes.WizardScene(
         ctx.reply('Please enter a name for the group set.');
     }
 );
-
-export const sendWizard = handleMenu;
