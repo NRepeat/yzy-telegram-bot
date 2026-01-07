@@ -7,10 +7,10 @@ import {
   IButton,
   IContext,
   IReplyAlertOptions,
-  IReplyOrEditOptions,
   IReplyOrEditWithPhotoOptions,
 } from 'src/shared/interfaces';
-import { ButtonsStack, I18nPath, Langs } from 'src/shared/types';
+import { ButtonsStack, Langs } from 'src/shared/types';
+import { I18nPath } from 'src/shared/types/translate.types.generated';
 import { InlineKeyboardMarkup, Message } from 'telegraf/types';
 import {
   Buttons,
@@ -43,22 +43,25 @@ export class ExtraService {
       reply_markup?: InlineKeyboardMarkup;
     },
   ) {
-    const { reply_markup = null } = options;
-    if (!reply_markup) {
-      throw new Error('reply_markup not fund');
-    }
+    const { reply_markup } = options; // reply_markup is optional, no default to null
+
     const phrase = this.translate.findPhrase(options.text, lang, options.args);
 
+    const messageOptions: {
+      reply_markup?: InlineKeyboardMarkup;
+      parse_mode: 'HTML';
+    } = {
+      parse_mode: 'HTML',
+    };
+
+    if (reply_markup) {
+      messageOptions.reply_markup = reply_markup;
+    }
+
     try {
-      return (await ctx.editMessageText(phrase, {
-        reply_markup,
-        parse_mode: 'HTML',
-      })) as Message.TextMessage;
+      return (await ctx.editMessageText(phrase, messageOptions)) as Message.TextMessage;
     } catch (e) {
-      return await ctx.sendMessage(phrase, {
-        reply_markup,
-        parse_mode: 'HTML',
-      });
+      return await ctx.sendMessage(phrase, messageOptions);
     }
   }
 

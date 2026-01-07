@@ -11,15 +11,15 @@
         "create": "Create",
         "control": "⚙ Control"
     },
-    "admin": {
-        "home": "Admin-panel",
-        "create": "Create",
-        "control": "⚙ Control"
-    },
     "buy": "Buy",
     "group_set_manager": {
         "create": "Create Group Set",
         "list": "List Group Sets",
-        "back": "Back"
+        "back": "Back",
+        "rename_set": "Rename Set",
+        "delete_set": "Delete Set",
+        "add_group": "Add Group",
+        "remove_group": "Remove Group",
+        "cancel_add_group": "Cancel"
     }
 }

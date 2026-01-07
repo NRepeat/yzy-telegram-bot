@@ -5,16 +5,16 @@ import { CallbackQuery, Message, Update } from 'telegraf/types';
 import { SceneContextScene } from 'telegraf/scenes';
 import { Langs } from '../types';
 
-export interface IContext extends BaseContext {
-  update: Update.CallbackQueryUpdate & { message: Message.PhotoMessage };
-  scene: ISceneContextScene;
-  session: SessionData;
-  message: Update.New & Update.NonChannel & Message & { text?: string };
-  callbackQuery: CallbackQuery & { data: string };
+export interface ISceneContextScene<TContext extends BaseContext = IContext> extends SceneContextScene<TContext, SceneSession> {
+  enter: (id: string) => Promise<unknown>;
 }
 
-interface ISceneContextScene extends SceneContextScene<IContext, SceneSession> {
-  enter: (id: string) => Promise<unknown>;
+export interface IContext extends BaseContext {
+  update: Update.CallbackQueryUpdate & { message: Message.PhotoMessage };
+  scene: ISceneContextScene<IContext>;
+  session: SessionData; // Re-added session property
+  message: Update.New & Update.NonChannel & Message & { text?: string };
+  callbackQuery: CallbackQuery & { data: string };
 }
 
 interface SessionData extends TelegrafScenes.SceneSession<SceneSession> {
@@ -34,4 +34,5 @@ interface SceneSession extends TelegrafScenes.SceneSessionData {
   state: {
     token?: string;
   };
+  cursor: number; // Changed to required
 }

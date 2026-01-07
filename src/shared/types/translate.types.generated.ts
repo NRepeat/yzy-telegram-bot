@@ -27,6 +27,11 @@ export type I18nTranslations = {
             "create": string;
             "list": string;
             "back": string;
+            "rename_set": string;
+            "delete_set": string;
+            "add_group": string;
+            "remove_group": string;
+            "cancel_add_group": string;
         };
     };
     "phrases": {
@@ -57,6 +62,14 @@ export type I18nTranslations = {
             "group_added": string;
             "group_removed": string;
             "set_list": string;
+            "set_name_exists": string;
+            "cancelled": string;
+            "no_sets_found": string;
+            "manage_set_welcome": string;
+            "add_group_prompt": string;
+            "invalid_group_message": string;
+            "group_already_in_set": string;
+            "delete_set_confirm": string;
         };
     };
     "languages": {

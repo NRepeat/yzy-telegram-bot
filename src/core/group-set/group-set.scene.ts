@@ -45,12 +45,12 @@ export class GroupSetScene {
 
   @ActionContract('buttons.group_set_manager.create')
   async createGroupSet(ctx: IContext) {
-    await ctx.scene.enter('scenes.group_set_manager.create'); // Transition to a wizard scene for creation
+    await ctx.scene.enter('scenes.group_set_manager.create');
   }
 
   @ActionContract('buttons.group_set_manager.list')
   async listGroupSets(ctx: IContext) {
-    await ctx.scene.enter('scenes.group_set_manager.list'); // Transition to a scene to list and manage sets
+    await ctx.scene.enter('scenes.group_set_manager.list');
   }
 
   @ActionContract('buttons.group_set_manager.back')

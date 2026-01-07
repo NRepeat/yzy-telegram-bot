@@ -25,6 +25,15 @@
         "set_deleted": "Group set '{name}' deleted successfully!",
         "group_added": "Group {chat_id} added to set '{name}'!",
         "group_removed": "Group {chat_id} removed from set '{name}'!",
-        "set_list": "Here are your group sets:\n{list}"
+        "group_removed": "Group {chat_id} removed from set '{name}'!",
+        "set_list": "Here are your group sets:\n{list}",
+        "set_name_exists": "A group set with this name already exists. Please choose a different name.",
+        "cancelled": "Operation cancelled.",
+        "no_sets_found": "No group sets found. Create one first!",
+        "manage_set_welcome": "Managing group set: <b>{setName}</b>\nGroups in this set:\n{groups}",
+        "add_group_prompt": "Please forward a message from the group you want to add. Make sure the bot is an administrator in that group.",
+        "invalid_group_message": "Invalid message. Please forward a message from a group.",
+        "group_already_in_set": "Group {chat_id} is already in set '{name}'!",
+        "delete_set_confirm": "Are you sure you want to delete the group set '{setName}'? This action cannot be undone."
     }
 }
