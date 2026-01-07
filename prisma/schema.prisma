@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -22,8 +24,8 @@ model Group {
 }
 
 model GroupSet {
-  id    Int             @id @default(autoincrement())
-  name  String          @unique
+  id    Int            @id @default(autoincrement())
+  name  String         @unique
   items GroupSetItem[]
 }
 
@@ -35,11 +37,11 @@ model GroupSetItem {
 }
 
 model Broadcast {
-  id        Int                 @id @default(autoincrement())
-  text      String
+  id         Int                @id @default(autoincrement())
+  text       String
   created_at DateTime           @default(now())
   updated_at DateTime           @updatedAt
-  messages  BroadcastMessage[]
+  messages   BroadcastMessage[]
 }
 
 model BroadcastMessage {
