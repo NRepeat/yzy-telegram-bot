@@ -10,7 +10,6 @@ export class SessionService {
    * * ! Идите в пизду
    * */
   resetBotSession(ctx: IContext): void {
-    console.log(ctx);
     this.resetImage(ctx).resetPropsOnCreate(ctx);
   }
 

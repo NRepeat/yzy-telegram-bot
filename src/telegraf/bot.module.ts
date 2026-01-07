@@ -13,10 +13,6 @@ import { session } from 'telegraf';
 // import { session } from 'telegraf';
 
 const store = (config: ConfigService) => {
-  console.log(
-    config.get<string>('DATABASE_NAME'),
-    config.get<string>('DATABASE_PASS'),
-  );
   return Postgres<PostgresAdapter>({
     database: config.get<string>('DATABASE_NAME') || '',
     host: config.get<string>('DATABASE_HOST') || '',
