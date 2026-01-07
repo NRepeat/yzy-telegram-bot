@@ -44,7 +44,12 @@ export class RenameGroupSetWizard {
       text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath, // Needs localization
       args: { currentName: selectedGroupSet.name },
       ...Markup.inlineKeyboard([
-        [Markup.button.callback('buttons.cancel' as I18nPath, 'cancel_rename_set')],
+        [
+          Markup.button.callback(
+            'buttons.cancel' as I18nPath,
+            'cancel_rename_set',
+          ),
+        ],
       ]),
     });
     ctx.wizard.next(); // Move to the next step to receive the new name
@@ -73,7 +78,8 @@ export class RenameGroupSetWizard {
 
     try {
       // Check if a group set with this newName already exists (excluding the current set)
-      const existingGroupSet = await this.groupSetService.getGroupSetByName(newName);
+      const existingGroupSet =
+        await this.groupSetService.getGroupSetByName(newName);
       if (existingGroupSet && existingGroupSet.id !== setId) {
         await this.extra.replyOrEdit(ctx, lang, {
           text: 'phrases.group_set_manager.set_name_exists' as I18nPath,
@@ -81,10 +87,13 @@ export class RenameGroupSetWizard {
         return; // Stay on the same step
       }
 
-      const updatedSet = await this.groupSetService.updateGroupSetName(setId, newName);
+      const updatedSet = await this.groupSetService.updateGroupSetName(
+        setId,
+        newName,
+      );
       await this.extra.replyOrEdit(ctx, lang, {
-        text: 'phrases.group_set_manager.set_renamed' as I18nPath, // Needs localization
-        args: { oldName: ctx.wizard.state.oldName, newName: updatedSet.name },
+        text: 'phrases.group_set_manager.set_renamed' as I18nPath,
+        args: { oldName: ctx.wizard.state, newName: updatedSet.name },
       });
       await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     } catch (error) {
