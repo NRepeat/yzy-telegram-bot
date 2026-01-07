@@ -45,8 +45,14 @@ export class DeleteGroupSetWizard {
       args: { setName: selectedGroupSet.name },
       ...Markup.inlineKeyboard([
         [
-          Markup.button.callback('buttons.accept' as I18nPath, 'confirm_delete_set'),
-          Markup.button.callback('buttons.cancel' as I18nPath, 'cancel_delete_set'),
+          Markup.button.callback(
+            'buttons.accept' as I18nPath,
+            'confirm_delete_set',
+          ),
+          Markup.button.callback(
+            'buttons.cancel' as I18nPath,
+            'cancel_delete_set',
+          ),
         ],
       ]),
     });

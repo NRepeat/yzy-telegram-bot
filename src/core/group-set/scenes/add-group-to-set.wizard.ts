@@ -27,7 +27,12 @@ export class AddGroupToSetWizard {
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.add_group_prompt' as I18nPath, // Needs localization
       ...Markup.inlineKeyboard([
-        [Markup.button.callback('buttons.cancel' as I18nPath, 'cancel_add_group')], // Needs localization
+        [
+          Markup.button.callback(
+            'buttons.cancel' as I18nPath,
+            'cancel_add_group',
+          ),
+        ], // Needs localization
       ]),
     });
     ctx.wizard.next(); // Move to the next step to receive the forwarded message
@@ -54,10 +59,13 @@ export class AddGroupToSetWizard {
     if ((message as any).forward_from_chat) {
       chatId = BigInt((message as any).forward_from_chat.id);
       chatTitle = (message as any).forward_from_chat.title;
-    } else if ((message as any).chat?.type === 'group' || (message as any).chat?.type === 'supergroup') {
-        // If the message is directly from a group where the bot is installed
-        chatId = BigInt((message as any).chat.id);
-        chatTitle = (message as any).chat.title;
+    } else if (
+      (message as any).chat?.type === 'group' ||
+      (message as any).chat?.type === 'supergroup'
+    ) {
+      // If the message is directly from a group where the bot is installed
+      chatId = BigInt((message as any).chat.id);
+      chatTitle = (message as any).chat.title;
     }
 
     if (!chatId || !chatTitle) {
@@ -69,7 +77,9 @@ export class AddGroupToSetWizard {
 
     try {
       // Ensure the group exists in the main Group table
-      let groupRecord = await this.prisma.group.findUnique({ where: { chat_id: chatId } });
+      let groupRecord = await this.prisma.group.findUnique({
+        where: { chat_id: chatId },
+      });
       if (!groupRecord) {
         groupRecord = await this.prisma.group.create({
           data: { chat_id: chatId, title: chatTitle },

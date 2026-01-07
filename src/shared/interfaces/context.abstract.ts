@@ -5,7 +5,9 @@ import { CallbackQuery, Message, Update } from 'telegraf/types';
 import { SceneContextScene } from 'telegraf/scenes';
 import { Langs } from '../types';
 
-export interface ISceneContextScene<TContext extends BaseContext = IContext> extends SceneContextScene<TContext, SceneSession> {
+export interface ISceneContextScene<
+  TContext extends BaseContext = IContext,
+> extends SceneContextScene<TContext, SceneSession> {
   enter: (id: string) => Promise<unknown>;
 }
 

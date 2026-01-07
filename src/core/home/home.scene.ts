@@ -2,10 +2,14 @@ import { SceneEnter } from 'nestjs-telegraf';
 import { ActionContract, SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../extra/extra.service';
 import type { IContext } from 'src/shared/interfaces';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @SceneContract('scenes.home')
 export class HomeScene {
-  constructor(private readonly extra: ExtraService) {}
+  constructor(
+    private readonly extra: ExtraService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @SceneEnter()
   async start(ctx: IContext) {
@@ -15,13 +19,7 @@ export class HomeScene {
     await extra.replyOrEdit(ctx, lang, {
       text: 'phrases.home',
       args: { username: ctx.from?.username },
-      ...extra.typedInlineKeyboard(
-        [
-          ['buttons.faq', 'buttons.change_language'],
-          [{ text: 'buttons.admin.home' }],
-        ],
-        lang,
-      ),
+      ...extra.typedInlineKeyboard([[{ text: 'buttons.admin.home' }]], lang),
     });
   }
 

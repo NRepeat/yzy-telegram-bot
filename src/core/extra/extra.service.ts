@@ -59,7 +59,10 @@ export class ExtraService {
     }
 
     try {
-      return (await ctx.editMessageText(phrase, messageOptions)) as Message.TextMessage;
+      return (await ctx.editMessageText(
+        phrase,
+        messageOptions,
+      )) as Message.TextMessage;
     } catch (e) {
       return await ctx.sendMessage(phrase, messageOptions);
     }

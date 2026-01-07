@@ -12,6 +12,7 @@ import { SessionService } from 'src/core/session';
 import { PostgresAdapter } from 'kysely';
 import { Postgres } from '@telegraf/session/pg';
 import { session } from 'telegraf';
+import { GroupModule } from 'src/core/group/group.module';
 // import { session } from 'telegraf';
 
 const store = (config: ConfigService) => {
@@ -26,7 +27,6 @@ const store = (config: ConfigService) => {
     },
   });
 };
-console.log(store);
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,7 +35,6 @@ console.log(store);
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        console.log(config);
         return {
           token: config.get<string>('TELEGRAM_BOT_TOKEN') || '',
           middlewares: [session({ store: store(config) })],
@@ -53,6 +52,7 @@ console.log(store);
     // InfoModule,
     HomeModule,
     AdminModule,
+    GroupModule,
     GroupSetModule,
   ],
   controllers: [BotController],
