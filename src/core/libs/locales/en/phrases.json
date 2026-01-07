@@ -16,5 +16,15 @@
     "objects": {
         "name": "name",
         "description": "description"
+    },
+    "group_set_manager": {
+        "welcome": "Welcome to Group Set Manager! Current group sets: {groupSetNames}",
+        "enter_name": "Please enter a name for the new group set:",
+        "set_created": "Group set '{name}' created successfully!",
+        "set_not_found": "Group set not found.",
+        "set_deleted": "Group set '{name}' deleted successfully!",
+        "group_added": "Group {chat_id} added to set '{name}'!",
+        "group_removed": "Group {chat_id} removed from set '{name}'!",
+        "set_list": "Here are your group sets:\n{list}"
     }
 }

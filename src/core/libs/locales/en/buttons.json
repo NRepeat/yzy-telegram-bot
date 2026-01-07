@@ -11,5 +11,15 @@
         "create": "Create",
         "control": "⚙ Control"
     },
-    "buy": "Buy"
+    "admin": {
+        "home": "Admin-panel",
+        "create": "Create",
+        "control": "⚙ Control"
+    },
+    "buy": "Buy",
+    "group_set_manager": {
+        "create": "Create Group Set",
+        "list": "List Group Sets",
+        "back": "Back"
+    }
 }

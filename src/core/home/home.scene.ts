@@ -37,6 +37,6 @@ export class HomeScene {
 
   @ActionContract('buttons.change_language')
   async toChangeLanguage(ctx: IContext) {
-    await ctx.scene.enter('scenes.change_language');
+    await ctx.scene.enter('scenes.group_set_manager');
   }
 }

@@ -24,6 +24,10 @@ interface SessionData extends TelegrafScenes.SceneSession<SceneSession> {
   messageId?: number;
   lang: Langs;
   isAdmin: boolean;
+  groupSet?: {
+    selectedGroupSetId?: number;
+    selectedChatIds: bigint[];
+  };
 }
 
 interface SceneSession extends TelegrafScenes.SceneSessionData {

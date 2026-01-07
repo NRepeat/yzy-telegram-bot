@@ -23,6 +23,11 @@ export type I18nTranslations = {
             "control": string;
         };
         "buy": string;
+        "group_set_manager": {
+            "create": string;
+            "list": string;
+            "back": string;
+        };
     };
     "phrases": {
         "home": string;
@@ -43,6 +48,16 @@ export type I18nTranslations = {
             "name": string;
             "description": string;
         };
+        "group_set_manager": {
+            "welcome": string;
+            "enter_name": string;
+            "set_created": string;
+            "set_not_found": string;
+            "set_deleted": string;
+            "group_added": string;
+            "group_removed": string;
+            "set_list": string;
+        };
     };
     "languages": {
         "en": string;
@@ -55,6 +70,7 @@ export type I18nTranslations = {
         "faq": string;
         "admin": string;
         "change_language": string;
+        "group_set_manager": string;
     };
 };
 /* prettier-ignore */

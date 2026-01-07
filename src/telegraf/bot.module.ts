@@ -6,6 +6,8 @@ import { BotService } from './bot.service';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { BotUpdate } from './bot.update';
 import { HomeModule } from 'src/core/home';
+import { AdminModule } from 'src/core/admin';
+import { GroupSetModule } from 'src/core/group-set';
 import { SessionService } from 'src/core/session';
 import { PostgresAdapter } from 'kysely';
 import { Postgres } from '@telegraf/session/pg';
@@ -50,7 +52,8 @@ console.log(store);
     // ChangeLanguageModule,
     // InfoModule,
     HomeModule,
-    // AdminModule,
+    AdminModule,
+    GroupSetModule,
   ],
   controllers: [BotController],
   providers: [BotService, BotUpdate, SessionService],

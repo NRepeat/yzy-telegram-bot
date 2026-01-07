@@ -3,6 +3,7 @@
         "home": "home",
         "faq": "faq",
         "admin": "admin",
-        "change_language": "change_language"
+        "change_language": "change_language",
+        "group_set_manager": "group_set_manager"
     }
 }
