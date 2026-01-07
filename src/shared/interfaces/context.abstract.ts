@@ -9,6 +9,12 @@ export interface ISceneContextScene<
   TContext extends BaseContext = IContext,
 > extends SceneContextScene<TContext, SceneSession> {
   enter: (id: string) => Promise<unknown>;
+  state: {
+    groups: {
+      selected: [];
+      activeSets: [];
+    };
+  };
 }
 
 export interface IContext extends BaseContext {
@@ -26,6 +32,7 @@ interface SessionData extends TelegrafScenes.SceneSession<SceneSession> {
   messageId?: number;
   lang: Langs;
   isAdmin: boolean;
+
   groupSet?: {
     selectedGroupSetId?: number;
     selectedChatIds: bigint[];

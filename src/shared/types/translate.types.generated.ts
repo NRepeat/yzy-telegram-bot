@@ -8,6 +8,7 @@ export type I18nTranslations = {
     "alerts": {
         "language_already_exists": string;
         "success_created": string;
+        "not_admin": string;
     };
     "buttons": {
         "back": string;
@@ -21,6 +22,7 @@ export type I18nTranslations = {
             "home": string;
             "create": string;
             "control": string;
+            "groups": string;
         };
         "buy": string;
         "group_set_manager": {
@@ -33,6 +35,7 @@ export type I18nTranslations = {
             "remove_group": string;
             "cancel_add_group": string;
         };
+        "close": string;
     };
     "phrases": {
         "home": string;

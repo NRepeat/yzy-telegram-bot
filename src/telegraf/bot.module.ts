@@ -13,6 +13,8 @@ import { PostgresAdapter } from 'kysely';
 import { Postgres } from '@telegraf/session/pg';
 import { session } from 'telegraf';
 import { GroupModule } from 'src/core/group/group.module';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ExtraModule } from 'src/core/extra';
 // import { session } from 'telegraf';
 
 const store = (config: ConfigService) => {
@@ -54,8 +56,9 @@ const store = (config: ConfigService) => {
     AdminModule,
     GroupModule,
     GroupSetModule,
+    ExtraModule,
   ],
   controllers: [BotController],
-  providers: [BotService, BotUpdate, SessionService],
+  providers: [BotService, BotUpdate, SessionService, PrismaService],
 })
 export class BotModule {}

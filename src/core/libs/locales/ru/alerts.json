@@ -1,4 +1,5 @@
 {
-    "language_already_exists": "Язык {lang} уже установлен",
-    "success_created": "Успешно создано: {target} с {prop} {value}"
+  "language_already_exists": "Язык {lang} уже установлен",
+  "success_created": "Успешно создано: {target} с {prop} {value}",
+  "not_admin": "У вас {name} нет прав"
 }

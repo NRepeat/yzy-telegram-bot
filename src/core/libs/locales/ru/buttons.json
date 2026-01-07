@@ -1,25 +1,26 @@
 {
+  "back": "Назад",
+  "change_language": "Сменить язык",
+  "faq": "Информация",
+  "name": "имя",
+  "accept": "✅ Принять",
+  "cancel": "❌ Отменить",
+  "delete_photo": "Удалить фото",
+  "close": "❌ Закрыть",
+  "admin": {
+    "home": "Админ-панель",
+    "create": "Создать",
+    "groups": "Группы"
+  },
+  "buy": "Buy",
+  "group_set_manager": {
+    "create": "Создать набор групп",
+    "list": "Список наборов групп",
     "back": "Назад",
-    "change_language": "Сменить язык",
-    "faq": "Информация",
-    "name": "имя",
-    "accept": "✅ Принять",
-    "cancel": "❌ Отменить",
-    "delete_photo": "Удалить фото",
-    "admin": {
-        "home": "Админ-панель",
-        "create": "Создать",
-        "control": "⚙ Управление"
-    },
-    "buy": "Buy",
-    "group_set_manager": {
-        "create": "Создать набор групп",
-        "list": "Список наборов групп",
-        "back": "Назад",
-        "rename_set": "Переименовать набор",
-        "delete_set": "Удалить набор",
-        "add_group": "Добавить группу",
-        "remove_group": "Удалить группу",
-        "cancel_add_group": "Отмена"
-    }
+    "rename_set": "Переименовать набор",
+    "delete_set": "Удалить набор",
+    "add_group": "Добавить группу",
+    "remove_group": "Удалить группу",
+    "cancel_add_group": "Отмена"
+  }
 }

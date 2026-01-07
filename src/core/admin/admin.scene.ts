@@ -16,7 +16,7 @@ export class AdminScene {
       text: 'phrases.admin',
       ...extra.typedInlineKeyboard(
         [
-          ['buttons.admin.control', 'buttons.group_set_manager.list'], // Placeholder, assuming control is another admin function
+          ['buttons.admin.groups', 'buttons.group_set_manager.list'], // Placeholder, assuming control is another admin function
           ['buttons.back'],
         ],
         lang,
@@ -35,9 +35,8 @@ export class AdminScene {
   }
 
   // TODO: Add other admin actions
-  @ActionContract('buttons.admin.control')
+  @ActionContract('buttons.admin.groups')
   async toAdminControl(ctx: IContext) {
-    await ctx.reply('Admin control functionality goes here...');
-    // Potentially enter another admin-specific scene
+    await ctx.scene.enter('scenes.groups');
   }
 }

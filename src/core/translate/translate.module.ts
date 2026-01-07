@@ -8,10 +8,7 @@ import {
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { TranslateService } from './translate.service';
-console.log(
-  join(__dirname, '../libs/locales/'),
-  "join(__dirname, '../libs/locales/')",
-);
+
 @Module({
   imports: [
     I18nModule.forRootAsync({

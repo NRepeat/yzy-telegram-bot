@@ -53,7 +53,6 @@ export class ExtraService {
     } = {
       parse_mode: 'HTML',
     };
-
     if (reply_markup) {
       messageOptions.reply_markup = reply_markup;
     }

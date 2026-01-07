@@ -3,10 +3,11 @@ import { HomeScene } from './home.scene';
 import { ExtraModule } from '../extra';
 import { TranslateModule } from '../translate';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AdminService } from '../admin/admin.service';
 
 @Module({
   imports: [ExtraModule, TranslateModule],
-  providers: [HomeScene, PrismaService],
+  providers: [HomeScene, PrismaService, AdminService],
   exports: [HomeScene],
 })
 export class HomeModule {}
