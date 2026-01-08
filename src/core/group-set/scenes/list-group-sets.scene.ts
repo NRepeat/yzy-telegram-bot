@@ -4,13 +4,16 @@ import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Markup } from 'telegraf';
+import { TranslateService } from '../../translate';
+import { CallbackButton } from 'telegram-keyboard';
+import { ButtonsStack } from 'src/shared/types';
 
 @SceneContract('scenes.group_set_manager.list')
 export class ListGroupSetsScene {
   constructor(
     private readonly extra: ExtraService,
     private readonly groupSetService: GroupSetService,
+    private readonly translate: TranslateService,
   ) {}
 
   @SceneEnter()
@@ -21,28 +24,32 @@ export class ListGroupSetsScene {
     if (groupSets.length === 0) {
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.group_set_manager.no_sets_found' as I18nPath,
-        ...Markup.inlineKeyboard([
-          [Markup.button.callback('buttons.back' as I18nPath, 'back')],
-        ]),
+        ...this.extra.typedInlineKeyboard(
+          [[{ text: 'buttons.back' as I18nPath, callback_data: 'back' }]],
+          lang,
+        ),
       });
       return;
     }
-
-    const buttons = groupSets.map((set) =>
-      Markup.button.callback(set.name, `select_group_set_${set.id}`),
-    );
+    // groupSets.map((set) => ([{}]))
+    const buttons: ButtonsStack = [
+      groupSets.map((set) => ({
+        text: set.name as I18nPath,
+        callback_data: `select_group_set_${set.id}`,
+      })),
+    ];
+    console.log('2131230-132013201320123');
+    buttons.push([
+      {
+        text: 'buttons.back',
+        callback_data: 'buttons.back',
+      },
+    ]);
 
     await this.extra.replyOrEdit(ctx, lang, {
-      text: 'phrases.group_set_manager.set_list' as I18nPath,
-      args: {
-        list:
-          groupSets.map((set) => `- ${set.name}`).join('\n') ||
-          ('phrases.group_set_manager.no_sets_found' as I18nPath),
-      },
-      ...Markup.inlineKeyboard([
-        ...buttons.map((btn) => [btn]), // Each button on a new line
-        [Markup.button.callback('buttons.back' as I18nPath, 'back')],
-      ]),
+      text: 'phrases.group_set_manager.set_list',
+      args: { username: ctx.from?.username },
+      ...this.extra.typedInlineKeyboard(buttons, lang),
     });
   }
 
@@ -65,6 +72,7 @@ export class ListGroupSetsScene {
 
   @ActionContract('buttons.back')
   async backToGroupSetManager(@Ctx() ctx: IContext) {
+    console.log(ctx);
     await ctx.scene.enter('scenes.group_set_manager');
   }
 }

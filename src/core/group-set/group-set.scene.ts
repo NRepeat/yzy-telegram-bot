@@ -13,6 +13,7 @@ export class GroupSetScene {
 
   @SceneEnter()
   async enter(ctx: IContext) {
+    console.log(ctx.session.groupSet, '---------------');
     const { extra } = this;
     const { lang } = ctx.session;
 
@@ -23,9 +24,9 @@ export class GroupSetScene {
         selectedChatIds: [],
       };
     }
-
-    const groupSets = await this.groupSetService.getAllGroupSets();
-    const groupSetNames = groupSets.map((gs) => gs.name).join(', ');
+    const groupSets = ctx.session.groupSet.selectedChatIds || [];
+    // const groupSets = await this.groupSetService.getAllGroupSets();
+    const groupSetNames = groupSets.map((gs) => gs).join(', ');
 
     await extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.welcome',
@@ -50,6 +51,7 @@ export class GroupSetScene {
 
   @ActionContract('buttons.group_set_manager.list')
   async listGroupSets(ctx: IContext) {
+    console.log('312123123123');
     await ctx.scene.enter('scenes.group_set_manager.list');
   }
 
