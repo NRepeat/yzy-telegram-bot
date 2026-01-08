@@ -36,6 +36,7 @@ export type I18nTranslations = {
             "cancel_add_group": string;
         };
         "close": string;
+        "send": string;
     };
     "phrases": {
         "home": string;
