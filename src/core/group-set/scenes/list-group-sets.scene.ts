@@ -7,9 +7,6 @@ import type {
   I18nPath,
   I18nTranslations,
 } from 'src/shared/types/translate.types.generated';
-import { TranslateService } from '../../translate';
-import { CallbackButton } from 'telegram-keyboard';
-import { ButtonsStack } from 'src/shared/types';
 import { PathImpl2 } from '@nestjs/config';
 
 @SceneContract('scenes.group_set_manager.list')
@@ -17,7 +14,6 @@ export class ListGroupSetsScene {
   constructor(
     private readonly extra: ExtraService,
     private readonly groupSetService: GroupSetService,
-    private readonly translate: TranslateService,
   ) {}
 
   @SceneEnter()
@@ -61,7 +57,6 @@ export class ListGroupSetsScene {
     });
   }
 
-  // Action handler for selecting a group set
   @Action(/select_group_set_(\d+)/)
   async onSelectGroupSet(@Ctx() ctx: IContext) {
     const match = (ctx.callbackQuery as any).data.match(
@@ -69,7 +64,6 @@ export class ListGroupSetsScene {
     );
     const setId = parseInt(match[1], 10);
 
-    // Store the selected group set ID in session for further actions
     if (!ctx.session.groupSet) {
       ctx.session.groupSet = { selectedChatIds: [] };
     }

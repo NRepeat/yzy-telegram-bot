@@ -88,21 +88,21 @@ export class ManageGroupSetScene {
 
     const text = ctx.message && 'text' in ctx.message ? ctx.message.text : null;
     if (!text) return ctx.reply('Пожалуйста, отправьте именно текст.');
-    const { lang, groupSet } = ctx.session;
+    const { groupSet } = ctx.session;
     const setId = groupSet?.selectedGroupSetId;
     if (!setId) {
-      ctx.scene.reenter();
+      await ctx.scene.reenter();
       return;
     }
     const groupIds = await this.groupSetService.getGroupSetById(setId);
     if (!groupIds.groups) {
-      ctx.reply('В этом сете нет груп');
-      ctx.scene.reenter();
+      await ctx.reply('В этом сете нет груп');
+      await ctx.scene.reenter();
       return;
     }
     if (groupIds.groups?.length === 0) {
-      ctx.reply('В этом сете нет груп');
-      ctx.scene.reenter();
+      await ctx.reply('В этом сете нет груп');
+      await ctx.scene.reenter();
       return;
     }
     for (const chatId of groupIds.groups) {
@@ -140,7 +140,6 @@ export class ManageGroupSetScene {
 
   @ActionContract('remove_group_from_set')
   async onRemoveGroupFromSet(@Ctx() ctx: IContext) {
-    // TODO: Implement wizard for removing group
     await ctx.reply('Remove group from set functionality to be implemented.');
     return ctx.scene.reenter();
   }

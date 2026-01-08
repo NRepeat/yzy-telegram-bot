@@ -57,5 +57,4 @@ export class GroupSetScene {
     await ctx.scene.enter('scenes.home');
   }
 
-  // TODO: Add more action contracts for editing, deleting, adding groups, etc.
 }
