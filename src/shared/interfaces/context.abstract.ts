@@ -13,7 +13,7 @@ export interface ISceneContextScene<
     step: string;
     lastMenuId: number | undefined;
     groups: {
-      selected: [];
+      selected: bigint[];
       activeSets: [];
     };
   };

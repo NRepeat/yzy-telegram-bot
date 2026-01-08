@@ -6,17 +6,17 @@ import { GroupService } from './group.service';
 
 @SceneContract('scenes.groups')
 export class GroupScene {
-  constructor(
-    private readonly extra: ExtraService,
-    private readonly groupService: GroupService,
-  ) {}
+  constructor(private readonly groupService: GroupService) {}
 
   @SceneEnter()
   async enter(@Ctx() ctx: IContext) {
+    const { groupSet } = ctx.session;
+    const selectedChatIds = groupSet?.selectedChatIds || [];
+    console.log(selectedChatIds);
     // Инициализация стейта, если его нет
     if (!ctx.scene.state.groups) {
       ctx.scene.state.groups = {
-        selected: [],
+        selected: selectedChatIds ? selectedChatIds : [],
         activeSets: [],
       };
     }
@@ -24,7 +24,7 @@ export class GroupScene {
     await this.render(ctx);
   }
 
-  private getSelected(ctx: IContext): string[] {
+  private getSelected(ctx: IContext): bigint[] {
     if (!ctx.scene.state.groups.selected) {
       ctx.scene.state.groups.selected = [];
     }
@@ -37,7 +37,10 @@ export class GroupScene {
 
     const keyboard = groups.map((g) => {
       const gId = g.chat_id.toString();
-      const isSelected = selected.includes(gId);
+      const isSelected = selected
+        .map((s) => s.toString())
+        .includes(String(gId.toString()));
+      console.log(gId, isSelected);
       return [
         {
           text: `${isSelected ? '☑️' : '⬜'} ${g.title}`,
@@ -46,10 +49,14 @@ export class GroupScene {
       ];
     });
 
-    keyboard.push([
-      { text: '🚀 Отправить всем выбранным', callback_data: 'send' },
-      { text: '📁+ Создать сет', callback_data: 'creat_set' },
-    ]);
+    keyboard.push(
+      [{ text: '🚀 Отправить', callback_data: 'send' }],
+      [
+        { text: '📥+ Добавить в сет', callback_data: 'add_to_set' },
+
+        { text: '📁+ Создать сет', callback_data: 'creat_set' },
+      ],
+    );
     keyboard.push([{ text: '❌ Отмена', callback_data: 'cancel' }]);
 
     const messageText = `<b>Меню рассылки</b>\n\nВыбрано групп: <b>${selected.length}</b>\nВыберите группы из списка ниже и нажмите "Отправить".`;
@@ -141,7 +148,7 @@ export class GroupScene {
 
     for (const chatId of selected) {
       try {
-        await ctx.telegram.sendMessage(chatId, text);
+        await ctx.telegram.sendMessage(Number(chatId), text);
       } catch (e) {
         console.error(e);
       }
@@ -155,14 +162,44 @@ export class GroupScene {
 
     ctx.scene.state.groups.selected = [];
     ctx.scene.state.step = '';
+    if (ctx.session.groupSet?.selectedChatIds) {
+      ctx.session.groupSet.selectedChatIds = [];
+    }
     return await ctx.scene.reenter();
   }
 
   @Action('cancel')
   async cancel(@Ctx() ctx: IContext) {
     await ctx.answerCbQuery();
+    ctx.scene.state.groups.selected = [];
+    ctx.scene.state.step = '';
+    if (ctx.session.groupSet?.selectedChatIds) {
+      ctx.session.groupSet.selectedChatIds = [];
+    }
     return await ctx.scene.enter('scenes.admin');
   }
+  @Action('add_to_set')
+  async add_to_set(@Ctx() ctx: IContext) {
+    if (!ctx.session.groupSet?.selectedChatIds) {
+      await ctx.answerCbQuery(
+        '⚠️ Сначала выберите хотя бы одну группу!',
+        // { show_alert: true },
+      );
+      return;
+    }
+    if (
+      ctx.session.groupSet?.selectedChatIds &&
+      ctx.session.groupSet?.selectedChatIds?.length === 0
+    ) {
+      await ctx.answerCbQuery(
+        '⚠️ Сначала выберите хотя бы одну группу!',
+        // { show_alert: true },
+      );
+      return;
+    }
+    return await ctx.scene.enter('scenes.group_set_manager.add_to_set');
+  }
+
   @Action('creat_set')
   async creat_set(@Ctx() ctx: IContext) {
     await ctx.answerCbQuery();
@@ -177,17 +214,14 @@ export class GroupScene {
       ctx.session.groupSet?.selectedChatIds &&
       ctx.session.groupSet?.selectedChatIds?.length === 0
     ) {
-      console.log(
-        ctx.session.groupSet?.selectedChatIds,
-        ctx.session.groupSet?.selectedChatIds?.length,
-      );
-
       await ctx.answerCbQuery(
         '⚠️ Сначала выберите хотя бы одну группу!',
         // { show_alert: true },
       );
       return;
     }
+    await ctx.answerCbQuery();
+
     return await ctx.scene.enter('scenes.group_set_manager.create');
   }
 }

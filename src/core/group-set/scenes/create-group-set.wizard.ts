@@ -20,9 +20,6 @@ export class CreateGroupSetWizard {
   @WizardStep(1)
   async onEnter(@Ctx() ctx: WizardCtx) {
     const { lang } = ctx.session;
-    const groupSets = ctx.session.groupSet?.selectedChatIds || [];
-    const groupSetNames = groupSets.map((gs) => gs).join(', ');
-    console.log(groupSetNames);
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.enter_name' as I18nPath,
       ...this.extra.typedInlineKeyboard(
@@ -30,6 +27,7 @@ export class CreateGroupSetWizard {
         lang,
       ),
     });
+    await ctx.answerCbQuery();
     ctx.wizard.next();
   }
 
@@ -38,7 +36,7 @@ export class CreateGroupSetWizard {
   async onNameInput(@Ctx() ctx: WizardCtx) {
     const { lang } = ctx.session;
 
-    const name = (ctx.message as any).text;
+    const name = (ctx.message as any).text as string;
 
     if (!name || name.trim().length === 0) {
       await this.extra.replyOrEdit(ctx, lang, {
@@ -48,19 +46,16 @@ export class CreateGroupSetWizard {
     }
 
     try {
-      // Check if a group set with this name already exists
       const existingGroupSet =
         await this.groupSetService.getGroupSetByName(name);
       if (existingGroupSet) {
         await this.extra.replyOrEdit(ctx, lang, {
           text: 'phrases.group_set_manager.set_name_exists' as I18nPath,
         });
-        return; // Stay on the same step
+        return;
       }
-      console.log(name);
       const newGroupSet = await this.groupSetService.createGroupSet(name);
       const groupSets = ctx.session.groupSet?.selectedChatIds || [];
-      // const groupSets = await this.groupSetService.getAllGroupSets();
 
       if (newGroupSet && groupSets) {
         for (const id of groupSets) {

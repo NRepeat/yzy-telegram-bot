@@ -142,6 +142,7 @@ export class ManageGroupSetScene {
   async onRemoveGroupFromSet(@Ctx() ctx: IContext) {
     await ctx.reply('Remove group from set functionality to be implemented.');
     return ctx.scene.reenter();
+
   }
 
   @ActionContract('back_to_list')

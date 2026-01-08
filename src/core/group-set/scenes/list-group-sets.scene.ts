@@ -1,5 +1,5 @@
 import { Action, Ctx, SceneEnter } from 'nestjs-telegraf';
-import { ActionContract, SceneContract } from 'src/shared/decorators';
+import { SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext } from 'src/shared/interfaces';
@@ -46,7 +46,7 @@ export class ListGroupSetsScene {
     buttons.push([
       {
         text: 'buttons.back',
-        callback_data: 'buttons.back',
+        callback_data: 'back',
       },
     ]);
 
@@ -72,7 +72,7 @@ export class ListGroupSetsScene {
     await ctx.scene.enter('scenes.group_set_manager.manage_selected');
   }
 
-  @ActionContract('buttons.back')
+  @Action('back')
   async backToGroupSetManager(@Ctx() ctx: IContext) {
     console.log(ctx);
     await ctx.scene.enter('scenes.group_set_manager');

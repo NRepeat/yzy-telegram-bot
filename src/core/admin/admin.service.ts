@@ -47,6 +47,7 @@ export class AdminService {
     }
   }
   async createAdmin(name: string) {
+    console.log('Creating admin:', name);
     return this.prisma.user.create({
       data: {
         username: name,

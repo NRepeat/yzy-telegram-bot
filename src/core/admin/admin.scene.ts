@@ -16,8 +16,8 @@ export class AdminScene {
       text: 'phrases.admin',
       ...extra.typedInlineKeyboard(
         [
-          ['buttons.admin.groups', 'buttons.group_set_manager.list'], // Placeholder, assuming control is another admin function
-          ['buttons.back'],
+          ['buttons.admin.groups', 'buttons.group_set_manager.list'],
+          ['buttons.close'],
         ],
         lang,
       ),
@@ -29,12 +29,12 @@ export class AdminScene {
     await ctx.scene.enter('scenes.group_set_manager');
   }
 
-  @ActionContract('buttons.back')
+  @ActionContract('buttons.close')
   async backToHome(ctx: IContext) {
-    await ctx.scene.enter('scenes.home');
+    await ctx.deleteMessage();
+    await ctx.scene.leave();
   }
 
-  // TODO: Add other admin actions
   @ActionContract('buttons.admin.groups')
   async toAdminControl(ctx: IContext) {
     await ctx.scene.enter('scenes.groups');

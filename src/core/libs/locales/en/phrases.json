@@ -18,7 +18,7 @@
         "description": "description"
     },
     "group_set_manager": {
-        "welcome": "Welcome to Group Set Manager! Current group sets: {groupSetNames}",
+        "welcome": "Welcome to Group Set Manager!}",
         "enter_name": "Please enter a name for the new group set:",
         "set_created": "Group set '{name}' created successfully!",
         "set_not_found": "Group set not found.",

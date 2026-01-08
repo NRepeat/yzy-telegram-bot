@@ -6,13 +6,11 @@ import type { I18nPath } from 'src/shared/types/translate.types.generated';
 import { Scenes as TelegrafScenes } from 'telegraf';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-// Local type for wizard context
 type WizardCtx = IContext & {
   scene: ISceneContextScene<WizardCtx>;
   wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
 };
 
-@Wizard('scenes.group_set_manager.add_group')
 @Wizard('scenes.group_set_manager.add_group')
 export class AddGroupToSetWizard {
   constructor(
@@ -44,7 +42,7 @@ export class AddGroupToSetWizard {
   @On('message')
   @WizardStep(2)
   async onMessageInput(@Ctx() ctx: WizardCtx) {
-    const { lang, groupSet } = ctx.session;
+    const { groupSet } = ctx.session;
     const setId = groupSet?.selectedGroupSetId;
     const message = ctx.message as any;
 
