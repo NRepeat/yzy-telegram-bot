@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GroupSet, GroupSetItem } from 'generated/prisma/client';
+import { Group, GroupSet, GroupSetItem } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,11 +12,19 @@ export class GroupSetService {
     });
   }
 
-  async getGroupSetById(id: number): Promise<GroupSet | null> {
-    return this.prisma.groupSet.findUnique({
+  async getGroupSetById(
+    id: number,
+  ): Promise<{ groupSet: GroupSet | null; groups: Group[] | null }> {
+    const groupSet = await this.prisma.groupSet.findUnique({
       where: { id },
       include: { items: true },
     });
+    const groups = await this.prisma.group.findMany({
+      where: {
+        chat_id: { in: groupSet?.items.map((item) => item.chat_id) },
+      },
+    });
+    return { groupSet, groups };
   }
 
   async getGroupSetByName(name: string): Promise<GroupSet | null> {

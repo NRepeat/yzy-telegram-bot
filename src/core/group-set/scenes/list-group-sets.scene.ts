@@ -3,10 +3,14 @@ import { ActionContract, SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext } from 'src/shared/interfaces';
-import type { I18nPath } from 'src/shared/types/translate.types.generated';
+import type {
+  I18nPath,
+  I18nTranslations,
+} from 'src/shared/types/translate.types.generated';
 import { TranslateService } from '../../translate';
 import { CallbackButton } from 'telegram-keyboard';
 import { ButtonsStack } from 'src/shared/types';
+import { PathImpl2 } from '@nestjs/config';
 
 @SceneContract('scenes.group_set_manager.list')
 export class ListGroupSetsScene {
@@ -31,14 +35,18 @@ export class ListGroupSetsScene {
       });
       return;
     }
-    // groupSets.map((set) => ([{}]))
-    const buttons: ButtonsStack = [
-      groupSets.map((set) => ({
+
+    const buttons: {
+      text: PathImpl2<I18nTranslations>;
+      callback_data: string;
+    }[][] = [];
+    for (let i = 0; i < groupSets.length; i += 2) {
+      const row = groupSets.slice(i, i + 2).map((set) => ({
         text: set.name as I18nPath,
         callback_data: `select_group_set_${set.id}`,
-      })),
-    ];
-    console.log('2131230-132013201320123');
+      }));
+      buttons.push(row);
+    }
     buttons.push([
       {
         text: 'buttons.back',

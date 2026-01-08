@@ -42,7 +42,7 @@ export class RenameGroupSetWizard {
 
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath, // Needs localization
-      args: { currentName: selectedGroupSet.name },
+      args: { currentName: selectedGroupSet.groupSet?.name },
       ...Markup.inlineKeyboard([
         [
           Markup.button.callback(

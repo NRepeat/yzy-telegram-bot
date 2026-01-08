@@ -13,7 +13,6 @@ export class GroupSetScene {
 
   @SceneEnter()
   async enter(ctx: IContext) {
-    console.log(ctx.session.groupSet, '---------------');
     const { extra } = this;
     const { lang } = ctx.session;
 

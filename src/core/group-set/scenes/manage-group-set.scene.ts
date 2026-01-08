@@ -26,10 +26,8 @@ export class ManageGroupSetScene {
       return;
     }
 
-    const selectedGroupSet = (await this.groupSetService.getGroupSetById(
-      setId,
-    )) as Prisma.GroupSetGetPayload<{ include: { items: true } }>;
-
+    const selectedGroupSet = await this.groupSetService.getGroupSetById(setId);
+    console.log(selectedGroupSet);
     if (!selectedGroupSet) {
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.group_set_manager.set_not_found' as I18nPath,
@@ -39,13 +37,13 @@ export class ManageGroupSetScene {
     }
 
     const groupNames =
-      selectedGroupSet.items.length > 0
-        ? selectedGroupSet.items.map((item) => `\`${item.chat_id}\``).join(', ')
+      selectedGroupSet.groups && selectedGroupSet.groups?.length > 0
+        ? selectedGroupSet.groups?.map((item) => `\`${item.title}\``).join(', ')
         : 'No groups added yet.';
-
+    console.log(selectedGroupSet.groups, 'No groups added yet.');
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.manage_set_welcome' as I18nPath, // Needs localization
-      args: { setName: selectedGroupSet.name, groups: groupNames },
+      args: { setName: selectedGroupSet.groupSet?.name, groups: groupNames },
       ...this.extra.typedInlineKeyboard(
         [
           [
