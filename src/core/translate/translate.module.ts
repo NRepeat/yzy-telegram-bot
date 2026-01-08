@@ -5,7 +5,6 @@ import {
   QueryResolver,
   AcceptLanguageResolver,
 } from 'nestjs-i18n';
-import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { TranslateService } from './translate.service';
 

@@ -204,12 +204,14 @@ export type GroupWhereInput = {
   id?: Prisma.IntFilter<"Group"> | number
   chat_id?: Prisma.BigIntFilter<"Group"> | bigint | number
   title?: Prisma.StringFilter<"Group"> | string
+  groupSetItems?: Prisma.GroupSetItemListRelationFilter
 }
 
 export type GroupOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   chat_id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  groupSetItems?: Prisma.GroupSetItemOrderByRelationAggregateInput
 }
 
 export type GroupWhereUniqueInput = Prisma.AtLeast<{
@@ -219,6 +221,7 @@ export type GroupWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.GroupWhereInput[]
   NOT?: Prisma.GroupWhereInput | Prisma.GroupWhereInput[]
   title?: Prisma.StringFilter<"Group"> | string
+  groupSetItems?: Prisma.GroupSetItemListRelationFilter
 }, "id" | "chat_id">
 
 export type GroupOrderByWithAggregationInput = {
@@ -244,23 +247,27 @@ export type GroupScalarWhereWithAggregatesInput = {
 export type GroupCreateInput = {
   chat_id: bigint | number
   title: string
+  groupSetItems?: Prisma.GroupSetItemCreateNestedManyWithoutChatInput
 }
 
 export type GroupUncheckedCreateInput = {
   id?: number
   chat_id: bigint | number
   title: string
+  groupSetItems?: Prisma.GroupSetItemUncheckedCreateNestedManyWithoutChatInput
 }
 
 export type GroupUpdateInput = {
   chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  groupSetItems?: Prisma.GroupSetItemUpdateManyWithoutChatNestedInput
 }
 
 export type GroupUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  groupSetItems?: Prisma.GroupSetItemUncheckedUpdateManyWithoutChatNestedInput
 }
 
 export type GroupCreateManyInput = {
@@ -308,6 +315,11 @@ export type GroupSumOrderByAggregateInput = {
   chat_id?: Prisma.SortOrder
 }
 
+export type GroupScalarRelationFilter = {
+  is?: Prisma.GroupWhereInput
+  isNot?: Prisma.GroupWhereInput
+}
+
 export type BigIntFieldUpdateOperationsInput = {
   set?: bigint | number
   increment?: bigint | number
@@ -316,12 +328,95 @@ export type BigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
+export type GroupCreateNestedOneWithoutGroupSetItemsInput = {
+  create?: Prisma.XOR<Prisma.GroupCreateWithoutGroupSetItemsInput, Prisma.GroupUncheckedCreateWithoutGroupSetItemsInput>
+  connectOrCreate?: Prisma.GroupCreateOrConnectWithoutGroupSetItemsInput
+  connect?: Prisma.GroupWhereUniqueInput
+}
+
+export type GroupUpdateOneRequiredWithoutGroupSetItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.GroupCreateWithoutGroupSetItemsInput, Prisma.GroupUncheckedCreateWithoutGroupSetItemsInput>
+  connectOrCreate?: Prisma.GroupCreateOrConnectWithoutGroupSetItemsInput
+  upsert?: Prisma.GroupUpsertWithoutGroupSetItemsInput
+  connect?: Prisma.GroupWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GroupUpdateToOneWithWhereWithoutGroupSetItemsInput, Prisma.GroupUpdateWithoutGroupSetItemsInput>, Prisma.GroupUncheckedUpdateWithoutGroupSetItemsInput>
+}
+
+export type GroupCreateWithoutGroupSetItemsInput = {
+  chat_id: bigint | number
+  title: string
+}
+
+export type GroupUncheckedCreateWithoutGroupSetItemsInput = {
+  id?: number
+  chat_id: bigint | number
+  title: string
+}
+
+export type GroupCreateOrConnectWithoutGroupSetItemsInput = {
+  where: Prisma.GroupWhereUniqueInput
+  create: Prisma.XOR<Prisma.GroupCreateWithoutGroupSetItemsInput, Prisma.GroupUncheckedCreateWithoutGroupSetItemsInput>
+}
+
+export type GroupUpsertWithoutGroupSetItemsInput = {
+  update: Prisma.XOR<Prisma.GroupUpdateWithoutGroupSetItemsInput, Prisma.GroupUncheckedUpdateWithoutGroupSetItemsInput>
+  create: Prisma.XOR<Prisma.GroupCreateWithoutGroupSetItemsInput, Prisma.GroupUncheckedCreateWithoutGroupSetItemsInput>
+  where?: Prisma.GroupWhereInput
+}
+
+export type GroupUpdateToOneWithWhereWithoutGroupSetItemsInput = {
+  where?: Prisma.GroupWhereInput
+  data: Prisma.XOR<Prisma.GroupUpdateWithoutGroupSetItemsInput, Prisma.GroupUncheckedUpdateWithoutGroupSetItemsInput>
+}
+
+export type GroupUpdateWithoutGroupSetItemsInput = {
+  chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type GroupUncheckedUpdateWithoutGroupSetItemsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+
+/**
+ * Count Type GroupCountOutputType
+ */
+
+export type GroupCountOutputType = {
+  groupSetItems: number
+}
+
+export type GroupCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  groupSetItems?: boolean | GroupCountOutputTypeCountGroupSetItemsArgs
+}
+
+/**
+ * GroupCountOutputType without action
+ */
+export type GroupCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GroupCountOutputType
+   */
+  select?: Prisma.GroupCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * GroupCountOutputType without action
+ */
+export type GroupCountOutputTypeCountGroupSetItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GroupSetItemWhereInput
+}
 
 
 export type GroupSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   chat_id?: boolean
   title?: boolean
+  groupSetItems?: boolean | Prisma.Group$groupSetItemsArgs<ExtArgs>
+  _count?: boolean | Prisma.GroupCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["group"]>
 
 export type GroupSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -343,10 +438,18 @@ export type GroupSelectScalar = {
 }
 
 export type GroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "chat_id" | "title", ExtArgs["result"]["group"]>
+export type GroupInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  groupSetItems?: boolean | Prisma.Group$groupSetItemsArgs<ExtArgs>
+  _count?: boolean | Prisma.GroupCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type GroupIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type GroupIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $GroupPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Group"
-  objects: {}
+  objects: {
+    groupSetItems: Prisma.$GroupSetItemPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     chat_id: bigint
@@ -745,6 +848,7 @@ readonly fields: GroupFieldRefs;
  */
 export interface Prisma__GroupClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  groupSetItems<T extends Prisma.Group$groupSetItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Group$groupSetItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupSetItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -794,6 +898,10 @@ export type GroupFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * Filter, which Group to fetch.
    */
   where: Prisma.GroupWhereUniqueInput
@@ -812,6 +920,10 @@ export type GroupFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * Filter, which Group to fetch.
    */
   where: Prisma.GroupWhereUniqueInput
@@ -829,6 +941,10 @@ export type GroupFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Group
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
   /**
    * Filter, which Group to fetch.
    */
@@ -878,6 +994,10 @@ export type GroupFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * Filter, which Group to fetch.
    */
   where?: Prisma.GroupWhereInput
@@ -926,6 +1046,10 @@ export type GroupFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * Filter, which Groups to fetch.
    */
   where?: Prisma.GroupWhereInput
@@ -968,6 +1092,10 @@ export type GroupCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Group
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
   /**
    * The data needed to create a Group.
    */
@@ -1016,6 +1144,10 @@ export type GroupUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Group
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
   /**
    * The data needed to update a Group.
    */
@@ -1083,6 +1215,10 @@ export type GroupUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * The filter to search for the Group to update in case it exists.
    */
   where: Prisma.GroupWhereUniqueInput
@@ -1109,6 +1245,10 @@ export type GroupDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
+  /**
    * Filter which Group to delete.
    */
   where: Prisma.GroupWhereUniqueInput
@@ -1129,6 +1269,30 @@ export type GroupDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Group.groupSetItems
+ */
+export type Group$groupSetItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GroupSetItem
+   */
+  select?: Prisma.GroupSetItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GroupSetItem
+   */
+  omit?: Prisma.GroupSetItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupSetItemInclude<ExtArgs> | null
+  where?: Prisma.GroupSetItemWhereInput
+  orderBy?: Prisma.GroupSetItemOrderByWithRelationInput | Prisma.GroupSetItemOrderByWithRelationInput[]
+  cursor?: Prisma.GroupSetItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GroupSetItemScalarFieldEnum | Prisma.GroupSetItemScalarFieldEnum[]
+}
+
+/**
  * Group without action
  */
 export type GroupDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1140,4 +1304,8 @@ export type GroupDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Group
    */
   omit?: Prisma.GroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupInclude<ExtArgs> | null
 }

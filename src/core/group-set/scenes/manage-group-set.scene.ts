@@ -3,7 +3,6 @@ import { ActionContract, SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext } from 'src/shared/interfaces';
-import { Markup } from 'telegraf';
 import { Prisma } from 'generated/prisma/client';
 import { I18nPath } from 'src/shared/types';
 
@@ -47,29 +46,32 @@ export class ManageGroupSetScene {
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.manage_set_welcome' as I18nPath, // Needs localization
       args: { setName: selectedGroupSet.name, groups: groupNames },
-      ...Markup.inlineKeyboard([
+      ...this.extra.typedInlineKeyboard(
         [
-          Markup.button.callback(
-            'buttons.group_set_manager.rename_set' as I18nPath,
-            'rename_set',
-          ), // Needs localization
-          Markup.button.callback(
-            'buttons.group_set_manager.delete_set' as I18nPath,
-            'delete_set',
-          ), // Needs localization
+          [
+            {
+              text: 'buttons.group_set_manager.rename_set' as I18nPath,
+              callback_data: 'rename_set',
+            },
+            {
+              text: 'buttons.group_set_manager.delete_set' as I18nPath,
+              callback_data: 'delete_set',
+            },
+          ],
+          [
+            {
+              text: 'buttons.group_set_manager.add_group' as I18nPath,
+              callback_data: 'add_group_to_set',
+            },
+            {
+              text: 'buttons.group_set_manager.remove_group' as I18nPath,
+              callback_data: 'remove_group_from_set',
+            },
+          ],
+          [{ text: 'buttons.back' as I18nPath, callback_data: 'back_to_list' }],
         ],
-        [
-          Markup.button.callback(
-            'buttons.group_set_manager.add_group' as I18nPath,
-            'add_group_to_set',
-          ), // Needs localization
-          Markup.button.callback(
-            'buttons.group_set_manager.remove_group' as I18nPath,
-            'remove_group_from_set',
-          ), // Needs localization
-        ],
-        [Markup.button.callback('buttons.back' as I18nPath, 'back_to_list')],
-      ]),
+        lang,
+      ),
     });
   }
 

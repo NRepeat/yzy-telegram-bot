@@ -31,7 +31,9 @@ export class ExtraService {
     try {
       const { messageId } = ctx.session;
       await ctx.deleteMessage(messageId ? messageId : undefined);
-    } catch (e) {}
+    } catch {
+      // Intentionally ignore the error
+    }
   }
 
   async replyOrEdit(
@@ -62,7 +64,8 @@ export class ExtraService {
         phrase,
         messageOptions,
       )) as Message.TextMessage;
-    } catch (e) {
+    } catch {
+      // Intentionally ignore the error, assuming message was already deleted or not found.
       return await ctx.sendMessage(phrase, messageOptions);
     }
   }

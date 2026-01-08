@@ -3,7 +3,6 @@ import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Markup } from 'telegraf';
 import { Scenes as TelegrafScenes } from 'telegraf';
 
 // Local type for wizard context
@@ -43,14 +42,17 @@ export class RenameGroupSetWizard {
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath, // Needs localization
       args: { currentName: selectedGroupSet.name },
-      ...Markup.inlineKeyboard([
+      ...this.extra.typedInlineKeyboard(
         [
-          Markup.button.callback(
-            'buttons.cancel' as I18nPath,
-            'cancel_rename_set',
-          ),
+          [
+            {
+              text: 'buttons.cancel' as I18nPath,
+              callback_data: 'cancel_rename_set',
+            },
+          ],
         ],
-      ]),
+        lang,
+      ),
     });
     ctx.wizard.next(); // Move to the next step to receive the new name
   }

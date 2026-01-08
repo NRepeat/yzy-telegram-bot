@@ -3,7 +3,6 @@ import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Markup } from 'telegraf';
 import { Scenes as TelegrafScenes } from 'telegraf'; // Import Scenes
 
 type WizardCtx = IContext & {
@@ -23,24 +22,26 @@ export class CreateGroupSetWizard {
     const { lang } = ctx.session;
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.enter_name' as I18nPath,
-      ...Markup.inlineKeyboard([
-        [Markup.button.callback('buttons.cancel' as I18nPath, 'cancel')],
-      ]),
+      ...this.extra.typedInlineKeyboard(
+        [[{ text: 'buttons.cancel' as I18nPath, callback_data: 'cancel' }]],
+        lang,
+      ),
     });
     ctx.wizard.next(); // Move to the next step to receive the name
   }
 
-  @On('text')
+  @On('message')
   @WizardStep(2)
   async onNameInput(@Ctx() ctx: WizardCtx) {
     const { lang } = ctx.session;
-    const name = (ctx.message as any).text; // Get the name from the user's message
+
+    const name = (ctx.message as any).text;
 
     if (!name || name.trim().length === 0) {
       await this.extra.replyOrEdit(ctx, lang, {
-        text: 'phrases.group_set_manager.enter_name' as I18nPath, // Re-prompt if name is empty
+        text: 'phrases.group_set_manager.enter_name' as I18nPath,
       });
-      return; // Stay on the same step
+      return;
     }
 
     try {
@@ -55,6 +56,14 @@ export class CreateGroupSetWizard {
       }
 
       const newGroupSet = await this.groupSetService.createGroupSet(name);
+      const groupSets = ctx.session.groupSet?.selectedChatIds || [];
+      // const groupSets = await this.groupSetService.getAllGroupSets();
+
+      if (newGroupSet && groupSets) {
+        for (const id of groupSets) {
+          await this.groupSetService.addGroupToSet(newGroupSet.id, BigInt(id));
+        }
+      }
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.group_set_manager.set_created' as I18nPath,
         args: { name: newGroupSet.name },

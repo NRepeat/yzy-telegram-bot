@@ -18,9 +18,10 @@ model User {
 }
 
 model Group {
-  id      Int    @id @default(autoincrement())
-  chat_id BigInt @unique
-  title   String
+  id            Int            @id @default(autoincrement())
+  chat_id       BigInt         @unique
+  title         String
+  groupSetItems GroupSetItem[]
 }
 
 model GroupSet {
@@ -33,6 +34,7 @@ model GroupSetItem {
   id      Int      @id @default(autoincrement())
   set     GroupSet @relation(fields: [setId], references: [id])
   setId   Int
+  chat    Group    @relation(fields: [chat_id], references: [chat_id])
   chat_id BigInt
 }
 

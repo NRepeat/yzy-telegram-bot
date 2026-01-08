@@ -3,6 +3,7 @@ import { SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../extra/extra.service';
 import type { IContext } from 'src/shared/interfaces';
 import { GroupService } from './group.service';
+import { InlineKeyboardButton } from 'telegraf/types';
 
 @SceneContract('scenes.groups')
 export class GroupScene {
@@ -24,7 +25,6 @@ export class GroupScene {
   }
 
   private getSelected(ctx: IContext): number[] {
-    // Always work with arrays since Sets don't serialize properly
     if (!Array.isArray(ctx.scene.state.groups.selected)) {
       ctx.scene.state.groups.selected = [];
     }
@@ -34,27 +34,29 @@ export class GroupScene {
   private async render(ctx: IContext, forceNew: boolean = false) {
     const groups = await this.groupService.getAllGroups({});
     const selected = this.getSelected(ctx);
-
-    // Generate keyboard with current selected state
-    const keyboard = groups.map((g) => [
-      {
+    const keyboard: InlineKeyboardButton[][] = [];
+    for (let i = 0; i < groups.length; i += 2) {
+      const row = groups.slice(i, i + 2).map((g) => ({
         text: `${selected.includes(Number(g.chat_id)) ? '☑️' : '⬜'} ${g.title}`,
         callback_data: `group_${g.chat_id}`,
-      },
+      }));
+      keyboard.push(row);
+    }
+    keyboard.push([
+      { text: 'Send', callback_data: 'send' },
+      { text: 'Add to set', callback_data: 'add_to_set' },
     ]);
-    keyboard.push([{ text: 'Send', callback_data: 'send' }]);
     keyboard.push([{ text: 'Cancel', callback_data: 'cancel' }]);
 
     const messageText = `Select groups: (${selected.length} selected)`;
 
-    // Edit or send message based on update type
     if (ctx.updateType === 'callback_query' && !forceNew) {
       try {
         await ctx.editMessageText(messageText, {
           reply_markup: { inline_keyboard: keyboard },
+          parse_mode: 'HTML',
         });
       } catch (err: any) {
-        // Ignore error if message content hasn't changed
         if (err?.response?.description?.includes('message is not modified')) {
           console.log('Message not modified, skipping update');
           return;
@@ -67,8 +69,26 @@ export class GroupScene {
       });
     }
   }
+  @Action('add_to_set')
+  async toGroupSetScene(ctx: IContext) {
+    const selectedGroups = this.getSelected(ctx);
 
-  @On('callback_query')
+    // Проверяем существование groupSet и инициализируем, если его нет
+    if (!ctx.session.groupSet) {
+      ctx.session.groupSet = { selectedChatIds: [] };
+    }
+
+    const sessionIds = ctx.session.groupSet.selectedChatIds || [];
+
+    const uniqIds = new Set([...selectedGroups, ...sessionIds]);
+
+    ctx.session.groupSet.selectedChatIds = Array.from(
+      uniqIds as any as bigint[],
+    );
+
+    await ctx.scene.enter('scenes.group_set_manager');
+  }
+  @Action(/group_(.+)/)
   async toggleGroup(ctx: IContext) {
     const chatId = Number(ctx.callbackQuery.data.replace('group_', ''));
     console.log('Toggling chatId:', chatId);

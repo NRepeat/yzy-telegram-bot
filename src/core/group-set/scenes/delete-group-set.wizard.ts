@@ -3,7 +3,6 @@ import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
 import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Markup } from 'telegraf';
 import { Scenes as TelegrafScenes } from 'telegraf';
 
 // Local type for wizard context
@@ -43,18 +42,21 @@ export class DeleteGroupSetWizard {
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.delete_set_confirm' as I18nPath, // Needs localization
       args: { setName: selectedGroupSet.name },
-      ...Markup.inlineKeyboard([
+      ...this.extra.typedInlineKeyboard(
         [
-          Markup.button.callback(
-            'buttons.accept' as I18nPath,
-            'confirm_delete_set',
-          ),
-          Markup.button.callback(
-            'buttons.cancel' as I18nPath,
-            'cancel_delete_set',
-          ),
+          [
+            {
+              text: 'buttons.accept' as I18nPath,
+              callback_data: 'confirm_delete_set',
+            },
+            {
+              text: 'buttons.cancel' as I18nPath,
+              callback_data: 'cancel_delete_set',
+            },
+          ],
         ],
-      ]),
+        lang,
+      ),
     });
   }
 

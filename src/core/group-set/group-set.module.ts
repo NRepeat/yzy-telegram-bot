@@ -8,9 +8,11 @@ import { ManageGroupSetScene } from './scenes/manage-group-set.scene';
 import { AddGroupToSetWizard } from './scenes/add-group-to-set.wizard';
 import { DeleteGroupSetWizard } from './scenes/delete-group-set.wizard';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TranslateModule } from '../translate';
+import { RenameGroupSetWizard } from './scenes';
 
 @Module({
-  imports: [ExtraModule],
+  imports: [ExtraModule, TranslateModule],
   providers: [
     GroupSetService,
     GroupSetScene,
@@ -19,6 +21,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
     ManageGroupSetScene,
     AddGroupToSetWizard,
     DeleteGroupSetWizard,
+    RenameGroupSetWizard,
     PrismaService,
   ],
   exports: [
@@ -29,6 +32,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
     ManageGroupSetScene,
     AddGroupToSetWizard,
     DeleteGroupSetWizard,
+    RenameGroupSetWizard,
   ],
 })
 export class GroupSetModule {}
