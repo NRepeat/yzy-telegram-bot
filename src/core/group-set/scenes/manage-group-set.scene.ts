@@ -40,7 +40,6 @@ export class ManageGroupSetScene {
       selectedGroupSet.groups && selectedGroupSet.groups?.length > 0
         ? selectedGroupSet.groups?.map((item) => `\`${item.title}\``).join(', ')
         : 'No groups added yet.';
-    console.log(selectedGroupSet.groups, 'No groups added yet.');
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.manage_set_welcome' as I18nPath, // Needs localization
       args: { setName: selectedGroupSet.groupSet?.name, groups: groupNames },
@@ -66,6 +65,7 @@ export class ManageGroupSetScene {
               callback_data: 'remove_group_from_set',
             },
           ],
+          [{ text: 'buttons.back' as I18nPath, callback_data: 'back_to_list' }],
           [{ text: 'buttons.back' as I18nPath, callback_data: 'back_to_list' }],
         ],
         lang,

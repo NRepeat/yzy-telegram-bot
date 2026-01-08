@@ -20,6 +20,9 @@ export class CreateGroupSetWizard {
   @WizardStep(1)
   async onEnter(@Ctx() ctx: WizardCtx) {
     const { lang } = ctx.session;
+    const groupSets = ctx.session.groupSet?.selectedChatIds || [];
+    const groupSetNames = groupSets.map((gs) => gs).join(', ');
+    console.log(groupSetNames);
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.enter_name' as I18nPath,
       ...this.extra.typedInlineKeyboard(
@@ -27,7 +30,7 @@ export class CreateGroupSetWizard {
         lang,
       ),
     });
-    ctx.wizard.next(); // Move to the next step to receive the name
+    ctx.wizard.next();
   }
 
   @On('message')
@@ -54,7 +57,7 @@ export class CreateGroupSetWizard {
         });
         return; // Stay on the same step
       }
-
+      console.log(name);
       const newGroupSet = await this.groupSetService.createGroupSet(name);
       const groupSets = ctx.session.groupSet?.selectedChatIds || [];
       // const groupSets = await this.groupSetService.getAllGroupSets();
@@ -63,6 +66,9 @@ export class CreateGroupSetWizard {
         for (const id of groupSets) {
           await this.groupSetService.addGroupToSet(newGroupSet.id, BigInt(id));
         }
+      }
+      if (ctx.session.groupSet?.selectedChatIds) {
+        ctx.session.groupSet.selectedChatIds = [];
       }
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.group_set_manager.set_created' as I18nPath,
@@ -74,7 +80,7 @@ export class CreateGroupSetWizard {
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.error' as I18nPath, // Generic error phrase
       });
-      await ctx.scene.enter('scenes.group_set_manager'); // Go back on error
+      await ctx.scene.enter('scenes.group_set_manager.list'); // Go back on error
     }
   }
 

@@ -1,4 +1,4 @@
-import { Action, On, SceneEnter } from 'nestjs-telegraf';
+import { Action, On, SceneEnter, Ctx } from 'nestjs-telegraf';
 import { SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../extra/extra.service';
 import type { IContext } from 'src/shared/interfaces';
@@ -12,20 +12,20 @@ export class GroupScene {
   ) {}
 
   @SceneEnter()
-  async enter(ctx: IContext) {
+  async enter(@Ctx() ctx: IContext) {
+    // Инициализация стейта, если его нет
     if (!ctx.scene.state.groups) {
       ctx.scene.state.groups = {
         selected: [],
         activeSets: [],
       };
     }
-    console.log(ctx.scene.state.groups);
+    ctx.scene.state.step = '';
     await this.render(ctx);
   }
 
-  private getSelected(ctx: IContext): number[] {
-    // Always work with arrays since Sets don't serialize properly
-    if (!Array.isArray(ctx.scene.state.groups.selected)) {
+  private getSelected(ctx: IContext): string[] {
+    if (!ctx.scene.state.groups.selected) {
       ctx.scene.state.groups.selected = [];
     }
     return ctx.scene.state.groups.selected;
@@ -35,101 +35,159 @@ export class GroupScene {
     const groups = await this.groupService.getAllGroups({});
     const selected = this.getSelected(ctx);
 
-    // Generate keyboard with current selected state
-    const keyboard = groups.map((g) => [
-      {
-        text: `${selected.includes(Number(g.chat_id)) ? '☑️' : '⬜'} ${g.title}`,
-        callback_data: `group_${g.chat_id}`,
-      },
+    const keyboard = groups.map((g) => {
+      const gId = g.chat_id.toString();
+      const isSelected = selected.includes(gId);
+      return [
+        {
+          text: `${isSelected ? '☑️' : '⬜'} ${g.title}`,
+          callback_data: `group_${gId}`,
+        },
+      ];
+    });
+
+    keyboard.push([
+      { text: '🚀 Отправить всем выбранным', callback_data: 'send' },
+      { text: '📁+ Создать сет', callback_data: 'creat_set' },
     ]);
-    keyboard.push([{ text: 'Send', callback_data: 'send' }]);
-    keyboard.push([{ text: 'Cancel', callback_data: 'cancel' }]);
+    keyboard.push([{ text: '❌ Отмена', callback_data: 'cancel' }]);
 
-    const messageText = `Select groups: (${selected.length} selected)`;
+    const messageText = `<b>Меню рассылки</b>\n\nВыбрано групп: <b>${selected.length}</b>\nВыберите группы из списка ниже и нажмите "Отправить".`;
 
-    // Edit or send message based on update type
     if (ctx.updateType === 'callback_query' && !forceNew) {
       try {
         await ctx.editMessageText(messageText, {
+          parse_mode: 'HTML',
           reply_markup: { inline_keyboard: keyboard },
         });
+        ctx.scene.state.lastMenuId = ctx.callbackQuery.message?.message_id;
       } catch (err: any) {
-        // Ignore error if message content hasn't changed
-        if (err?.response?.description?.includes('message is not modified')) {
-          console.log('Message not modified, skipping update');
-          return;
+        if (!err?.response?.description?.includes('message is not modified')) {
+          console.error('Render error:', err);
         }
-        console.error('Error editing message:', err);
       }
     } else {
-      await ctx.reply(messageText, {
+      const sentMsg = await ctx.reply(messageText, {
+        parse_mode: 'HTML',
         reply_markup: { inline_keyboard: keyboard },
       });
+      ctx.scene.state.lastMenuId = sentMsg.message_id;
     }
   }
 
-  @On('callback_query')
-  async toggleGroup(ctx: IContext) {
-    const chatId = Number(ctx.callbackQuery.data.replace('group_', ''));
-    console.log('Toggling chatId:', chatId);
-
+  @Action(/group_(-?\d+)/)
+  async toggleGroup(@Ctx() ctx: IContext) {
+    const match = (ctx.callbackQuery as any).data.match(/group_(-?\d+)/);
+    const chatId = match[1];
     const selected = this.getSelected(ctx);
+
     const index = selected.indexOf(chatId);
 
+    if (!ctx.session.groupSet) {
+      ctx.session.groupSet = { selectedChatIds: [] };
+    }
+    const sessionIds = ctx.session.groupSet.selectedChatIds;
     if (index > -1) {
       selected.splice(index, 1);
+      ctx.session.groupSet.selectedChatIds = sessionIds.filter(
+        (id) => id !== chatId,
+      );
     } else {
       selected.push(chatId);
+      const uniqueSet = new Set([...sessionIds, chatId]);
+      ctx.session.groupSet.selectedChatIds = Array.from(uniqueSet);
     }
-
-    console.log('Selected after toggle:', selected);
 
     await ctx.answerCbQuery();
     await this.render(ctx);
   }
 
   @Action('send')
-  async send(ctx: IContext) {
+  async send(@Ctx() ctx: IContext) {
     const selected = this.getSelected(ctx);
 
     if (selected.length === 0) {
-      await ctx.answerCbQuery('⚠️ Please select at least one group');
+      await ctx.answerCbQuery(
+        '⚠️ Сначала выберите хотя бы одну группу!',
+        // { show_alert: true },
+      );
       return;
+    } else {
+      ctx.scene.state.step = 'enter_text';
+      await ctx.answerCbQuery();
+      await ctx.reply('📝 Введите текст сообщения для рассылки:');
     }
-
-    await ctx.answerCbQuery();
-    await ctx.reply('Enter message text:');
-    // ctx.scene.state.step = 'enter_text';
-  }
-
-  @Action('cancel')
-  async cancel(ctx: IContext) {
-    await ctx.answerCbQuery();
-    await ctx.reply('Cancelled');
-    await ctx.scene.leave();
   }
 
   @On('text')
-  async onText(ctx: IContext) {
-    // if (ctx.scene.state.step !== 'enter_text') return;
+  async onText(@Ctx() ctx: IContext) {
+    if (ctx.scene.state.step !== 'enter_text') return;
 
-    // const text = ctx.message.text;
+    const text = ctx.message && 'text' in ctx.message ? ctx.message.text : null;
+    if (!text) return ctx.reply('Пожалуйста, отправьте именно текст.');
+
     const selected = this.getSelected(ctx);
 
-    await ctx.reply(`Sending to ${selected.length} group(s)...`);
-
-    // Send message to selected groups
-    let successCount = 0;
-    for (const chatId of selected) {
+    if (ctx.scene.state.lastMenuId) {
       try {
-        // await ctx.telegram.sendMessage(chatId, text);
-        successCount++;
-      } catch (err) {
-        console.error(`Failed to send to ${chatId}:`, err);
+        await ctx.telegram.deleteMessage(
+          ctx.chat?.id!,
+          ctx.scene.state.lastMenuId,
+        );
+      } catch (e) {
+        console.error('Не удалось удалить старое меню:', e);
       }
     }
 
-    await ctx.reply(`✅ Sent to ${successCount} of ${selected.length} groups`);
-    await ctx.scene.leave();
+    for (const chatId of selected) {
+      try {
+        await ctx.telegram.sendMessage(chatId, text);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    try {
+      await ctx.deleteMessage();
+    } catch (e) {}
+
+    await ctx.reply(`✅ Рассылка в ${selected.length} групп завершена!`);
+
+    ctx.scene.state.groups.selected = [];
+    ctx.scene.state.step = '';
+    return await ctx.scene.reenter();
+  }
+
+  @Action('cancel')
+  async cancel(@Ctx() ctx: IContext) {
+    await ctx.answerCbQuery();
+    return await ctx.scene.enter('scenes.admin');
+  }
+  @Action('creat_set')
+  async creat_set(@Ctx() ctx: IContext) {
+    await ctx.answerCbQuery();
+    if (!ctx.session.groupSet?.selectedChatIds) {
+      await ctx.answerCbQuery(
+        '⚠️ Сначала выберите хотя бы одну группу!',
+        // { show_alert: true },
+      );
+      return;
+    }
+    if (
+      ctx.session.groupSet?.selectedChatIds &&
+      ctx.session.groupSet?.selectedChatIds?.length === 0
+    ) {
+      console.log(
+        ctx.session.groupSet?.selectedChatIds,
+        ctx.session.groupSet?.selectedChatIds?.length,
+      );
+
+      await ctx.answerCbQuery(
+        '⚠️ Сначала выберите хотя бы одну группу!',
+        // { show_alert: true },
+      );
+      return;
+    }
+    return await ctx.scene.enter('scenes.group_set_manager.create');
   }
 }

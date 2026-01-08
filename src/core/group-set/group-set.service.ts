@@ -46,10 +46,10 @@ export class GroupSetService {
       where: { setId, chat_id },
     });
 
-    if (existingItem) {
-      // Potentially throw an error or handle as a no-op
-      throw new Error(`Group ${chat_id} is already in set ${setId}`);
-    }
+    // if (existingItem) {
+    //   // Potentially throw an error or handle as a no-op
+    //   throw new Error(`Group ${chat_id} is already in set ${setId}`);
+    // }
 
     return this.prisma.groupSetItem.create({
       data: {

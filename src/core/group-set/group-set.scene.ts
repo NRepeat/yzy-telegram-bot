@@ -24,7 +24,6 @@ export class GroupSetScene {
       };
     }
     const groupSets = ctx.session.groupSet.selectedChatIds || [];
-    // const groupSets = await this.groupSetService.getAllGroupSets();
     const groupSetNames = groupSets.map((gs) => gs).join(', ');
 
     await extra.replyOrEdit(ctx, lang, {
@@ -50,7 +49,6 @@ export class GroupSetScene {
 
   @ActionContract('buttons.group_set_manager.list')
   async listGroupSets(ctx: IContext) {
-    console.log('312123123123');
     await ctx.scene.enter('scenes.group_set_manager.list');
   }
 

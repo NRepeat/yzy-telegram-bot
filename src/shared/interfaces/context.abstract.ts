@@ -10,6 +10,8 @@ export interface ISceneContextScene<
 > extends SceneContextScene<TContext, SceneSession> {
   enter: (id: string) => Promise<unknown>;
   state: {
+    step: string;
+    lastMenuId: number | undefined;
     groups: {
       selected: [];
       activeSets: [];
