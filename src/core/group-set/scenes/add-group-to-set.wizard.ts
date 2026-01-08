@@ -1,3 +1,18 @@
+import { Action, Ctx, On, Wizard, WizardStep } from 'nestjs-telegraf';
+import { ExtraService } from '../../extra/extra.service';
+import { GroupSetService } from '../group-set.service';
+import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
+import type { I18nPath } from 'src/shared/types/translate.types.generated';
+import { Scenes as TelegrafScenes } from 'telegraf';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+// Local type for wizard context
+type WizardCtx = IContext & {
+  scene: ISceneContextScene<WizardCtx>;
+  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
+};
+
+@Wizard('scenes.group_set_manager.add_group')
 @Wizard('scenes.group_set_manager.add_group')
 export class AddGroupToSetWizard {
   constructor(
@@ -41,55 +56,56 @@ export class AddGroupToSetWizard {
     let chatId: bigint | undefined;
     let chatTitle: string | undefined;
 
-    // 1. ПРОВЕРКА: Ввел ли пользователь ID вручную текстом
     const text = message?.text?.trim();
-    if (text && /^-?\d+$/.test(text)) {
+
+    const parseMatch = text?.match(/^(-?\d+)\s+(.+)$/);
+
+    if (parseMatch) {
+      chatId = BigInt(parseMatch[1]);
+      chatTitle = parseMatch[2].trim();
+    } else if (text && /^-?\d+$/.test(text)) {
       chatId = BigInt(text);
       chatTitle = `Группа ${text}`;
     }
-    // 2. ПРОВЕРКА: Пересылка (старый формат)
+    // 3. ПРОВЕРКА: Пересылки (стандартные механизмы)
     else if (message.forward_from_chat) {
       chatId = BigInt(message.forward_from_chat.id);
       chatTitle = message.forward_from_chat.title;
-    }
-    // 3. ПРОВЕРКА: Пересылка (новый формат forward_origin)
-    else if (message.forward_origin?.chat) {
+    } else if (message.forward_origin?.chat) {
       chatId = BigInt(message.forward_origin.chat.id);
       chatTitle = message.forward_origin.chat.title;
-    }
-    // 4. ПРОВЕРКА: Если сообщение от имени канала
-    else if (message.sender_chat) {
+    } else if (message.sender_chat) {
       chatId = BigInt(message.sender_chat.id);
       chatTitle = message.sender_chat.title;
     }
 
-    // Если ничего не нашли
     if (!chatId) {
       await ctx.reply(
-        '⚠️ Не удалось распознать ID группы. Пожалуйста, введите ID вручную (например: -100123456789) или перешлите сообщение из публичной группы.',
+        '⚠️ Не удалось распознать формат.\n\n' +
+          'Введите данные в формате:\n`-100123456789 Моя Группа`\n' +
+          'Или просто ID, либо перешлите сообщение.',
+        { parse_mode: 'Markdown' },
       );
-      return; // Остаемся на этом шаге
+      return;
     }
 
     try {
-      // Upsert группы в базу
       await this.prisma.group.upsert({
         where: { chat_id: chatId },
         update: { title: chatTitle || `ID: ${chatId}` },
         create: { chat_id: chatId, title: chatTitle || `ID: ${chatId}` },
       });
 
-      // Привязка к сету
       await this.groupSetService.addGroupToSet(setId, chatId);
 
-      await ctx.reply(`✅ Группа "${chatTitle || chatId}" успешно добавлена!`);
+      await ctx.reply(`✅ Группа "${chatTitle}" (ID: ${chatId}) добавлена!`);
       await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     } catch (error: any) {
       if (error.message?.includes('already in set')) {
-        await ctx.reply('ℹ️ Эта группа уже добавлена в данный сет.');
+        await ctx.reply('ℹ️ Эта группа уже в этом сете.');
       } else {
         console.error('Add group error:', error);
-        await ctx.reply('❌ Произошла ошибка при добавлении группы.');
+        await ctx.reply('❌ Ошибка при добавлении.');
       }
       await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     }
