@@ -1,30 +1,16 @@
-import { Action, Ctx, On, Wizard, WizardStep } from 'nestjs-telegraf';
-import { ExtraService } from '../../extra/extra.service';
-import { GroupSetService } from '../group-set.service';
-import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
-import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Scenes as TelegrafScenes } from 'telegraf';
-import { PrismaService } from 'src/prisma/prisma.service';
-
-// Local type for wizard context, similar to create-group-set.wizard.ts
-type WizardCtx = IContext & {
-  scene: ISceneContextScene<WizardCtx>;
-  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
-};
-
 @Wizard('scenes.group_set_manager.add_group')
 export class AddGroupToSetWizard {
   constructor(
     private readonly extra: ExtraService,
     private readonly groupSetService: GroupSetService,
-    private readonly prisma: PrismaService, // Inject PrismaService to handle Group model
+    private readonly prisma: PrismaService,
   ) {}
 
   @WizardStep(1)
   async onEnter(@Ctx() ctx: WizardCtx) {
     const { lang } = ctx.session;
     await this.extra.replyOrEdit(ctx, lang, {
-      text: 'phrases.group_set_manager.add_group_prompt' as I18nPath, // Needs localization
+      text: 'phrases.group_set_manager.add_group_prompt' as I18nPath,
       ...this.extra.typedInlineKeyboard(
         [
           [
@@ -37,76 +23,73 @@ export class AddGroupToSetWizard {
         lang,
       ),
     });
-    ctx.wizard.next(); // Move to the next step to receive the forwarded message
+    ctx.wizard.next();
   }
 
-  @On('message') // Intercept any message (expecting a forwarded message)
+  @On('message')
   @WizardStep(2)
   async onMessageInput(@Ctx() ctx: WizardCtx) {
     const { lang, groupSet } = ctx.session;
     const setId = groupSet?.selectedGroupSetId;
+    const message = ctx.message as any;
 
     if (!setId) {
-      await this.extra.replyOrEdit(ctx, lang, {
-        text: 'phrases.group_set_manager.set_not_found' as I18nPath,
-      });
+      await ctx.reply('Ошибка: Сет не выбран.');
       return ctx.scene.enter('scenes.group_set_manager');
     }
 
-    const message = ctx.message;
     let chatId: bigint | undefined;
     let chatTitle: string | undefined;
 
-    // Check for forwarded message from a channel or group
-    if ((message as any).forward_from_chat) {
-      chatId = BigInt((message as any).forward_from_chat.id);
-      chatTitle = (message as any).forward_from_chat.title;
-    } else if (
-      (message as any).chat?.type === 'group' ||
-      (message as any).chat?.type === 'supergroup'
-    ) {
-      // If the message is directly from a group where the bot is installed
-      chatId = BigInt((message as any).chat.id);
-      chatTitle = (message as any).chat.title;
+    // 1. ПРОВЕРКА: Ввел ли пользователь ID вручную текстом
+    const text = message?.text?.trim();
+    if (text && /^-?\d+$/.test(text)) {
+      chatId = BigInt(text);
+      chatTitle = `Группа ${text}`;
+    }
+    // 2. ПРОВЕРКА: Пересылка (старый формат)
+    else if (message.forward_from_chat) {
+      chatId = BigInt(message.forward_from_chat.id);
+      chatTitle = message.forward_from_chat.title;
+    }
+    // 3. ПРОВЕРКА: Пересылка (новый формат forward_origin)
+    else if (message.forward_origin?.chat) {
+      chatId = BigInt(message.forward_origin.chat.id);
+      chatTitle = message.forward_origin.chat.title;
+    }
+    // 4. ПРОВЕРКА: Если сообщение от имени канала
+    else if (message.sender_chat) {
+      chatId = BigInt(message.sender_chat.id);
+      chatTitle = message.sender_chat.title;
     }
 
-    if (!chatId || !chatTitle) {
-      await this.extra.replyOrEdit(ctx, lang, {
-        text: 'phrases.group_set_manager.invalid_group_message' as I18nPath, // Needs localization
-      });
-      return; // Stay on the same step
+    // Если ничего не нашли
+    if (!chatId) {
+      await ctx.reply(
+        '⚠️ Не удалось распознать ID группы. Пожалуйста, введите ID вручную (например: -100123456789) или перешлите сообщение из публичной группы.',
+      );
+      return; // Остаемся на этом шаге
     }
 
     try {
-      // Ensure the group exists in the main Group table
-      let groupRecord = await this.prisma.group.findUnique({
+      // Upsert группы в базу
+      await this.prisma.group.upsert({
         where: { chat_id: chatId },
+        update: { title: chatTitle || `ID: ${chatId}` },
+        create: { chat_id: chatId, title: chatTitle || `ID: ${chatId}` },
       });
-      if (!groupRecord) {
-        groupRecord = await this.prisma.group.create({
-          data: { chat_id: chatId, title: chatTitle },
-        });
-      }
 
-      // Add the group to the selected GroupSet
+      // Привязка к сету
       await this.groupSetService.addGroupToSet(setId, chatId);
 
-      await this.extra.replyOrEdit(ctx, lang, {
-        text: 'phrases.group_set_manager.group_added' as I18nPath,
-        args: { chat_id: chatId.toString(), name: chatTitle },
-      });
+      await ctx.reply(`✅ Группа "${chatTitle || chatId}" успешно добавлена!`);
       await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     } catch (error: any) {
-      if (error.message.includes('already in set')) {
-        await this.extra.replyOrEdit(ctx, lang, {
-          text: 'phrases.group_set_manager.group_already_in_set' as I18nPath, // Needs localization
-          args: { chat_id: chatId.toString(), name: chatTitle },
-        });
+      if (error.message?.includes('already in set')) {
+        await ctx.reply('ℹ️ Эта группа уже добавлена в данный сет.');
       } else {
-        console.error('Error adding group to set:', error);
-        await this.extra.replyOrEdit(ctx, lang, {
-          text: 'phrases.error' as I18nPath,
-        });
+        console.error('Add group error:', error);
+        await ctx.reply('❌ Произошла ошибка при добавлении группы.');
       }
       await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     }
@@ -114,10 +97,6 @@ export class AddGroupToSetWizard {
 
   @Action('cancel_add_group')
   async onCancel(@Ctx() ctx: WizardCtx) {
-    const { lang } = ctx.session;
-    await this.extra.replyOrEdit(ctx, lang, {
-      text: 'phrases.cancelled' as I18nPath,
-    });
     await ctx.scene.enter('scenes.group_set_manager.manage_selected');
   }
 }
