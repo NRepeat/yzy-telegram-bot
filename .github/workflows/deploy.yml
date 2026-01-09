@@ -24,5 +24,4 @@ jobs:
             git pull origin main
             make build
             make up
-            make nginx-restart
             make prune

@@ -43,7 +43,7 @@ const store = (config: ConfigService) => {
           include: [BotModule],
           launchOptions: {
             webhook: {
-              domain: 'close-dane-shining.ngrok-free.app',
+              domain: config.get<string>('TELEGRAM_WEBHOOK_URL') || '',
               hookPath: '/webhook',
             },
           },
