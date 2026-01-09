@@ -12,8 +12,6 @@ export class GroupScene {
   async enter(@Ctx() ctx: IContext) {
     const { groupSet } = ctx.session;
     const selectedChatIds = groupSet?.selectedChatIds || [];
-    console.log(selectedChatIds);
-    // Инициализация стейта, если его нет
     if (!ctx.scene.state.groups) {
       ctx.scene.state.groups = {
         selected: selectedChatIds ? selectedChatIds : [],
@@ -24,7 +22,7 @@ export class GroupScene {
     await this.render(ctx);
   }
 
-  private getSelected(ctx: IContext): bigint[] {
+  private getSelected(ctx: IContext): string[] {
     if (!ctx.scene.state.groups.selected) {
       ctx.scene.state.groups.selected = [];
     }
@@ -40,7 +38,6 @@ export class GroupScene {
       const isSelected = selected
         .map((s) => s.toString())
         .includes(String(gId.toString()));
-      console.log(gId, isSelected);
       return [
         {
           text: `${isSelected ? '☑️' : '⬜'} ${g.title}`,
