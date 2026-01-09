@@ -96,7 +96,9 @@ export class AddGroupsToSetWizard {
         parse_mode: 'HTML',
         reply_markup: replyMarkup,
       });
-      ctx.scene.state.lastMenuId = sentMsg.message_id;
+      if (ctx.scene.state.lastMenuId) {
+        ctx.scene.state.lastMenuId.push(sentMsg.message_id);
+      }
     }
   }
 

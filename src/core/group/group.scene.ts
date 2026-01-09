@@ -70,7 +70,14 @@ export class GroupScene {
           parse_mode: 'HTML',
           reply_markup: { inline_keyboard: keyboard },
         });
-        ctx.scene.state.lastMenuId = ctx.callbackQuery.message?.message_id;
+        if (
+          ctx.scene.state.lastMenuId &&
+          ctx.callbackQuery.message?.message_id
+        ) {
+          ctx.scene.state.lastMenuId.push(
+            ctx.callbackQuery.message?.message_id,
+          );
+        }
       } catch (err: any) {
         if (!err?.response?.description?.includes('message is not modified')) {
           console.error('Render error:', err);
@@ -81,7 +88,10 @@ export class GroupScene {
         parse_mode: 'HTML',
         reply_markup: { inline_keyboard: keyboard },
       });
-      ctx.scene.state.lastMenuId = sentMsg.message_id;
+
+      if (ctx.scene.state.lastMenuId) {
+        ctx.scene.state.lastMenuId.push(sentMsg.message_id);
+      }
     }
   }
 
@@ -125,7 +135,12 @@ export class GroupScene {
     } else {
       ctx.scene.state.step = 'enter_text';
       await ctx.answerCbQuery();
-      await ctx.reply('📝 Введите текст сообщения для рассылки:');
+      const message = await ctx.reply(
+        '📝 Введите текст сообщения для рассылки:',
+      );
+      if (ctx.scene.state.lastMenuId) {
+        ctx.scene.state.lastMenuId.push(message.message_id);
+      }
     }
   }
 
@@ -138,31 +153,12 @@ export class GroupScene {
 
     const selected = this.getSelected(ctx);
 
-    if (ctx.scene.state.lastMenuId) {
-      try {
-        if (ctx.chat?.id) {
-          await ctx.telegram.deleteMessage(
-            ctx.chat?.id,
-            ctx.scene.state.lastMenuId,
-          );
-        }
-      } catch (e) {
-        console.error('Не удалось удалить старое меню:', e);
-      }
-    }
-
     for (const chatId of selected) {
       try {
         await ctx.telegram.sendMessage(Number(chatId), text);
       } catch (e) {
         console.error(e);
       }
-    }
-
-    try {
-      await ctx.deleteMessage();
-    } catch (e) {
-      console.error('Не удалось удалить сообщение:', e);
     }
 
     await ctx.reply(`✅ Рассылка в ${selected.length} групп завершена!`);
@@ -172,6 +168,23 @@ export class GroupScene {
     if (ctx.session.groupSet?.selectedChatIds) {
       ctx.session.groupSet.selectedChatIds = [];
     }
+    try {
+      if (ctx.scene.state.lastMenuId && ctx.scene.state.lastMenuId.length > 0) {
+        try {
+          for (const id of ctx.scene.state.lastMenuId) {
+            if (ctx.chat?.id) {
+              await ctx.telegram.deleteMessage(ctx.chat?.id, id);
+            }
+          }
+        } catch (e) {
+          console.error('Не удалось удалить старое меню:', e);
+        }
+      }
+      await ctx.deleteMessage();
+    } catch (e) {
+      console.error('Не удалось удалить сообщение:', e);
+    }
+
     return await ctx.scene.reenter();
   }
 
@@ -185,6 +198,7 @@ export class GroupScene {
       ctx.session.groupSet.selectedChatIds = [];
       ctx.session.groupSet.fromManageStep = false;
     }
+    ctx.scene.state.lastMenuId = undefined;
     if (fromManageStep) {
       return await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     }

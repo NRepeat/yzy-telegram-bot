@@ -11,7 +11,7 @@ export interface ISceneContextScene<
   enter: (id: string) => Promise<unknown>;
   state: {
     step: string;
-    lastMenuId: number | undefined;
+    lastMenuId: number[] | undefined;
     sets: {
       selectedSets?: string[];
       activeSets: [];
