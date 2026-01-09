@@ -26,6 +26,8 @@ services:
         - "image-name=yzy-bot"
     container_name: yzy-bot-app
     restart: always
+    ports:
+      - '3000:3000'
     depends_on:
       db:
         condition: service_healthy
@@ -37,16 +39,7 @@ services:
       NODE_ENV: production
     env_file:
       - .env
-    # command: sh -c "npm run setup"
 
-  nginx:
-    build:
-      context: ./nginx
-    restart: always
-    depends_on:
-      - app
-    ports:
-      - "80:80"
 
 volumes:
   postgres_data:
