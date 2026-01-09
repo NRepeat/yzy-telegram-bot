@@ -9,9 +9,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+    environment: prod
+
     steps:
-      - name: Deploy to server via SSH
+      - name: Deploy and Restart via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,6 +22,7 @@ jobs:
           script: |
             cd ~/yzy-bot
             git pull origin main
-            docker-compose down
-            docker-compose up --build -d
-            docker-compose logs --tail=100
+            make build
+            make up
+            make nginx-restart
+            make prune
