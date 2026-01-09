@@ -1,16 +1,10 @@
 import { Action, Ctx, Wizard, WizardStep } from 'nestjs-telegraf';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
-import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
+import type { IContext } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Scenes as TelegrafScenes } from 'telegraf';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ButtonsStack } from 'src/shared/types';
-
-type WizardCtx = IContext & {
-  scene: ISceneContextScene<WizardCtx>;
-  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
-};
+import type { WizardCtx } from 'src/shared/interfaces/wizard';
 
 @Wizard('scenes.group_set_manager.add_to_set')
 export class AddGroupsToSetWizard {
@@ -94,7 +88,9 @@ export class AddGroupsToSetWizard {
           parse_mode: 'HTML',
           reply_markup: replyMarkup,
         });
-      } catch (e) {}
+      } catch (e) {
+        console.error('Error editing message:', e);
+      }
     } else {
       const sentMsg = await ctx.reply(messageText, {
         parse_mode: 'HTML',
@@ -156,7 +152,7 @@ export class AddGroupsToSetWizard {
     }
 
     try {
-      let addedCount = 0;
+      const addedCount = 0;
       for (const groupId of chatIds) {
         for (const setID of selected) {
           await this.groupSetService.addGroupToSet(

@@ -1,14 +1,8 @@
 import { Action, Ctx, On, Wizard, WizardStep } from 'nestjs-telegraf';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
-import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Scenes as TelegrafScenes } from 'telegraf'; // Import Scenes
-
-type WizardCtx = IContext & {
-  scene: ISceneContextScene<WizardCtx>;
-  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
-};
+import type { WizardCtx } from 'src/shared/interfaces/wizard';
 
 @Wizard('scenes.group_set_manager.create')
 export class CreateGroupSetWizard {

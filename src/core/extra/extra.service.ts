@@ -31,7 +31,9 @@ export class ExtraService {
     try {
       const { messageId } = ctx.session;
       await ctx.deleteMessage(messageId ? messageId : undefined);
-    } catch (e) {}
+    } catch (e) {
+      console.error('Не удалось удалить сообщение:', e);
+    }
   }
 
   async replyOrEdit(
@@ -63,6 +65,7 @@ export class ExtraService {
         messageOptions,
       )) as Message.TextMessage;
     } catch (e) {
+      console.error('Не удалось редактировать сообщение:', e);
       return await ctx.sendMessage(phrase, messageOptions);
     }
   }

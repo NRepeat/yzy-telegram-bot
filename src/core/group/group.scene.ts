@@ -1,6 +1,5 @@
 import { Action, On, SceneEnter, Ctx } from 'nestjs-telegraf';
 import { SceneContract } from 'src/shared/decorators';
-import { ExtraService } from '../extra/extra.service';
 import type { IContext } from 'src/shared/interfaces';
 import { GroupService } from './group.service';
 
@@ -12,6 +11,7 @@ export class GroupScene {
   async enter(@Ctx() ctx: IContext) {
     const { groupSet } = ctx.session;
     const selectedChatIds = groupSet?.selectedChatIds || [];
+    const fromManageStep = groupSet?.fromManageStep || false;
     if (!ctx.scene.state.groups) {
       ctx.scene.state.groups = {
         selected: selectedChatIds ? selectedChatIds : [],
@@ -19,7 +19,7 @@ export class GroupScene {
       };
     }
     ctx.scene.state.step = '';
-    await this.render(ctx);
+    await this.render(ctx, fromManageStep);
   }
 
   private getSelected(ctx: IContext): string[] {
@@ -29,7 +29,7 @@ export class GroupScene {
     return ctx.scene.state.groups.selected;
   }
 
-  private async render(ctx: IContext, forceNew: boolean = false) {
+  private async render(ctx: IContext, fromManageStep?: boolean) {
     const groups = await this.groupService.getAllGroups({});
     const selected = this.getSelected(ctx);
 
@@ -45,20 +45,26 @@ export class GroupScene {
         },
       ];
     });
-
-    keyboard.push(
-      [{ text: '🚀 Отправить', callback_data: 'send' }],
-      [
+    if (fromManageStep) {
+      keyboard.push([
         { text: '📥+ Добавить в сет', callback_data: 'add_to_set' },
+      ]);
+    } else {
+      keyboard.push(
+        [{ text: '🚀 Отправить', callback_data: 'send' }],
+        [
+          { text: '📥+ Добавить в сет', callback_data: 'add_to_set' },
 
-        { text: '📁+ Создать сет', callback_data: 'creat_set' },
-      ],
-    );
+          { text: '📁+ Создать сет', callback_data: 'creat_set' },
+        ],
+      );
+    }
+
     keyboard.push([{ text: '❌ Отмена', callback_data: 'cancel' }]);
 
     const messageText = `<b>Меню рассылки</b>\n\nВыбрано групп: <b>${selected.length}</b>\nВыберите группы из списка ниже и нажмите "Отправить".`;
 
-    if (ctx.updateType === 'callback_query' && !forceNew) {
+    if (ctx.updateType === 'callback_query' && !false) {
       try {
         await ctx.editMessageText(messageText, {
           parse_mode: 'HTML',
@@ -134,10 +140,12 @@ export class GroupScene {
 
     if (ctx.scene.state.lastMenuId) {
       try {
-        await ctx.telegram.deleteMessage(
-          ctx.chat?.id!,
-          ctx.scene.state.lastMenuId,
-        );
+        if (ctx.chat?.id) {
+          await ctx.telegram.deleteMessage(
+            ctx.chat?.id,
+            ctx.scene.state.lastMenuId,
+          );
+        }
       } catch (e) {
         console.error('Не удалось удалить старое меню:', e);
       }
@@ -153,7 +161,9 @@ export class GroupScene {
 
     try {
       await ctx.deleteMessage();
-    } catch (e) {}
+    } catch (e) {
+      console.error('Не удалось удалить сообщение:', e);
+    }
 
     await ctx.reply(`✅ Рассылка в ${selected.length} групп завершена!`);
 
@@ -170,8 +180,13 @@ export class GroupScene {
     await ctx.answerCbQuery();
     ctx.scene.state.groups.selected = [];
     ctx.scene.state.step = '';
+    const fromManageStep = ctx.session.groupSet?.fromManageStep;
     if (ctx.session.groupSet?.selectedChatIds) {
       ctx.session.groupSet.selectedChatIds = [];
+      ctx.session.groupSet.fromManageStep = false;
+    }
+    if (fromManageStep) {
+      return await ctx.scene.enter('scenes.group_set_manager.manage_selected');
     }
     return await ctx.scene.enter('scenes.admin');
   }

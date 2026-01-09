@@ -115,7 +115,9 @@ export class ManageGroupSetScene {
 
     try {
       await ctx.deleteMessage();
-    } catch (e) {}
+    } catch (e) {
+      console.error('Error deleting message:', e);
+    }
 
     await ctx.reply(`✅ Рассылка в ${groupIds.groups.length} групп завершена!`);
 
@@ -135,7 +137,13 @@ export class ManageGroupSetScene {
 
   @ActionContract('add_group_to_set')
   async onAddGroupToSet(@Ctx() ctx: IContext) {
-    await ctx.scene.enter('scenes.group_set_manager.add_group');
+    if (!ctx.session.groupSet) {
+      ctx.session.groupSet = {
+        selectedChatIds: [],
+        fromManageStep: true,
+      };
+    }
+    await ctx.scene.enter('scenes.groups');
   }
 
   @ActionContract('remove_group_from_set')

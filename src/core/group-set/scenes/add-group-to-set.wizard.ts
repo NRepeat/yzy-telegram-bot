@@ -1,15 +1,9 @@
 import { Action, Ctx, On, Wizard, WizardStep } from 'nestjs-telegraf';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
-import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Scenes as TelegrafScenes } from 'telegraf';
 import { PrismaService } from 'src/prisma/prisma.service';
-
-type WizardCtx = IContext & {
-  scene: ISceneContextScene<WizardCtx>;
-  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
-};
+import type { WizardCtx } from 'src/shared/interfaces/wizard';
 
 @Wizard('scenes.group_set_manager.add_group')
 export class AddGroupToSetWizard {
@@ -64,9 +58,7 @@ export class AddGroupToSetWizard {
     } else if (text && /^-?\d+$/.test(text)) {
       chatId = BigInt(text);
       chatTitle = `Группа ${text}`;
-    }
-    // 3. ПРОВЕРКА: Пересылки (стандартные механизмы)
-    else if (message.forward_from_chat) {
+    } else if (message.forward_from_chat) {
       chatId = BigInt(message.forward_from_chat.id);
       chatTitle = message.forward_from_chat.title;
     } else if (message.forward_origin?.chat) {
