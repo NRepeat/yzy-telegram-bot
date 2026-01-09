@@ -1,0 +1,44 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: yzy-bot-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-user}
+      POSTGRES_PASSWORD: ${DATABASE_PASS:-password}
+      POSTGRES_DB: ${DATABASE_NAME:-yzy-bot}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    container_name: yzy-bot-app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - '3000:3000'
+    environment:
+      # DATABASE_URL is essential for Prisma. It can be set directly,
+      # or constructed from individual variables if they are present.
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${DATABASE_USER:-user}:${DATABASE_PASS:-password}@db:${DATABASE_PORT:-5432}/${DATABASE_NAME:-yzy-bot}}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST:-db}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL}
+      ADMIN_KEY: ${ADMIN_KEY}
+      NODE_ENV: production
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:

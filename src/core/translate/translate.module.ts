@@ -13,22 +13,22 @@ import { TranslateService } from './translate.service';
   imports: [
     I18nModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
-        fallbackLanguage: config.get<string>('FALLBACK_LANGUAGE') || '',
+        fallbackLanguage: config.get<string>('FALLBACK_LANGUAGE') || 'ru',
         fallbacks: {
           'en-*': 'en',
           'ru-*': 'ru',
         },
         loaderOptions: {
-          // path: join(__dirname, '../libs/locales/'),
-          path: 'src/core/libs/locales',
+          path: join(__dirname, '../../../libs/locales'),
+          // path: 'src/core/libs/locales',
           watch: true,
           includeSubfolders: true,
         },
-        typesOutputPath: 'src/shared/types/translate.types.generated.ts',
-        // typesOutputPath: join(
-        //   __dirname,
-        //   '../libs/shared/types/translate.types.generated.ts',
-        // ),
+        // typesOutputPath: 'src/shared/types/translate.types.generated.ts',
+        typesOutputPath: join(
+          __dirname,
+          '../../shared/types/translate.types.generated.ts',
+        ),
         catch(onrejected) {
           throw new NotFoundException(onrejected);
         },
