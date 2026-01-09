@@ -10,8 +10,14 @@ export interface ISceneContextScene<
 > extends SceneContextScene<TContext, SceneSession> {
   enter: (id: string) => Promise<unknown>;
   state: {
+    step: string;
+    lastMenuId: number | undefined;
+    sets: {
+      selectedSets?: string[];
+      activeSets: [];
+    };
     groups: {
-      selected: [];
+      selected: string[];
       activeSets: [];
     };
   };
@@ -35,7 +41,8 @@ interface SessionData extends TelegrafScenes.SceneSession<SceneSession> {
 
   groupSet?: {
     selectedGroupSetId?: number;
-    selectedChatIds: bigint[];
+    selectedChatIds: string[];
+    fromManageStep?: boolean;
   };
 }
 

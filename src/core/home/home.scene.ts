@@ -9,18 +9,19 @@ export class HomeScene {
 
   @SceneEnter()
   async start(ctx: IContext) {
-    const { extra } = this;
+    await ctx.scene.enter('scenes.admin');
+    // const { extra } = this;
 
-    const { lang } = ctx.session;
+    // const { lang } = ctx.session;
 
-    await this.extra.replyOrEdit(ctx, lang, {
-      text: 'phrases.home',
-      args: { username: ctx.from?.username },
-      ...extra.typedInlineKeyboard(
-        [[{ text: 'buttons.admin.home' }], [{ text: 'buttons.close' }]],
-        lang,
-      ),
-    });
+    // await this.extra.replyOrEdit(ctx, lang, {
+    //   text: 'phrases.home',
+    //   args: { username: ctx.from?.username },
+    //   ...extra.typedInlineKeyboard(
+    //     [[{ text: 'buttons.admin.home' }], [{ text: 'buttons.close' }]],
+    //     lang,
+    //   ),
+    // });
   }
 
   @ActionContract('buttons.admin.home')

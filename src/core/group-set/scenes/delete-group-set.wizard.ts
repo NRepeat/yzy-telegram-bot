@@ -41,7 +41,7 @@ export class DeleteGroupSetWizard {
 
     await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.delete_set_confirm' as I18nPath, // Needs localization
-      args: { setName: selectedGroupSet.name },
+      args: { setName: selectedGroupSet.groupSet?.name },
       ...this.extra.typedInlineKeyboard(
         [
           [

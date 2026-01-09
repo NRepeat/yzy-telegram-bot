@@ -2,35 +2,26 @@ import { SceneEnter } from 'nestjs-telegraf';
 import { ActionContract, SceneContract } from 'src/shared/decorators';
 import { ExtraService } from '../extra/extra.service';
 import type { IContext } from 'src/shared/interfaces';
-import { GroupSetService } from './group-set.service';
 
 @SceneContract('scenes.group_set_manager')
 export class GroupSetScene {
-  constructor(
-    private readonly extra: ExtraService,
-    private readonly groupSetService: GroupSetService,
-  ) {}
+  constructor(private readonly extra: ExtraService) {}
 
   @SceneEnter()
   async enter(ctx: IContext) {
-    console.log(ctx.session.groupSet, '---------------');
     const { extra } = this;
     const { lang } = ctx.session;
 
-    // Initialize session state for groupSet if it doesn't exist
     if (!ctx.session.groupSet) {
       ctx.session.groupSet = {
         selectedGroupSetId: undefined,
         selectedChatIds: [],
       };
     }
-    const groupSets = ctx.session.groupSet.selectedChatIds || [];
-    // const groupSets = await this.groupSetService.getAllGroupSets();
-    const groupSetNames = groupSets.map((gs) => gs).join(', ');
 
     await extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.welcome',
-      args: { groupSetNames: groupSetNames || 'none' },
+
       ...extra.typedInlineKeyboard(
         [
           [
@@ -56,8 +47,7 @@ export class GroupSetScene {
 
   @ActionContract('buttons.group_set_manager.back')
   async backToHome(ctx: IContext) {
-    await ctx.scene.enter('scenes.home');
+    console.log('backToHome');
+    await ctx.scene.enter('scenes.admin');
   }
-
-  // TODO: Add more action contracts for editing, deleting, adding groups, etc.
 }

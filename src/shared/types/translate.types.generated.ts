@@ -36,6 +36,7 @@ export type I18nTranslations = {
             "cancel_add_group": string;
         };
         "close": string;
+        "send": string;
     };
     "phrases": {
         "home": string;
@@ -73,6 +74,10 @@ export type I18nTranslations = {
             "invalid_group_message": string;
             "group_already_in_set": string;
             "delete_set_confirm": string;
+            "rename_set_prompt": string;
+            "set_renamed": string;
+            "no_groups_in_set": string;
+            "select_group_to_remove": string;
         };
     };
     "languages": {

@@ -31,8 +31,8 @@ export class ExtraService {
     try {
       const { messageId } = ctx.session;
       await ctx.deleteMessage(messageId ? messageId : undefined);
-    } catch {
-      // Intentionally ignore the error
+    } catch (e) {
+      console.error('Не удалось удалить сообщение:', e);
     }
   }
 
@@ -64,8 +64,8 @@ export class ExtraService {
         phrase,
         messageOptions,
       )) as Message.TextMessage;
-    } catch {
-      // Intentionally ignore the error, assuming message was already deleted or not found.
+    } catch (e) {
+      console.error('Не удалось редактировать сообщение:', e);
       return await ctx.sendMessage(phrase, messageOptions);
     }
   }

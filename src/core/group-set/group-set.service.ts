@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GroupSet, GroupSetItem } from 'generated/prisma/client';
+import { Group, GroupSet, GroupSetItem } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,11 +12,19 @@ export class GroupSetService {
     });
   }
 
-  async getGroupSetById(id: number): Promise<GroupSet | null> {
-    return this.prisma.groupSet.findUnique({
+  async getGroupSetById(
+    id: number,
+  ): Promise<{ groupSet: GroupSet | null; groups: Group[] | null }> {
+    const groupSet = await this.prisma.groupSet.findUnique({
       where: { id },
       include: { items: true },
     });
+    const groups = await this.prisma.group.findMany({
+      where: {
+        chat_id: { in: groupSet?.items.map((item) => item.chat_id) },
+      },
+    });
+    return { groupSet, groups };
   }
 
   async getGroupSetByName(name: string): Promise<GroupSet | null> {
@@ -38,10 +46,10 @@ export class GroupSetService {
       where: { setId, chat_id },
     });
 
-    if (existingItem) {
-      // Potentially throw an error or handle as a no-op
-      throw new Error(`Group ${chat_id} is already in set ${setId}`);
-    }
+    // if (existingItem) {
+    //   // Potentially throw an error or handle as a no-op
+    //   throw new Error(`Group ${chat_id} is already in set ${setId}`);
+    // }
 
     return this.prisma.groupSetItem.create({
       data: {
@@ -50,12 +58,15 @@ export class GroupSetService {
       },
     });
   }
-
-  async removeGroupFromSet(setId: number, chat_id: bigint): Promise<void> {
-    await this.prisma.groupSetItem.deleteMany({
-      where: {
-        setId,
-        chat_id,
+  async removeGroupFromSet(setId: number, chatId: bigint) {
+    return await this.prisma.groupSet.update({
+      where: { id: setId },
+      data: {
+        items: {
+          deleteMany: {
+            chat_id: chatId,
+          },
+        },
       },
     });
   }

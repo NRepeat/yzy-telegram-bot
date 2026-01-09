@@ -4,3 +4,5 @@ export * from './manage-group-set.scene';
 export * from './add-group-to-set.wizard';
 export * from './delete-group-set.wizard';
 export * from './rename-group-set.wizard';
+export * from './add-groups-to-set.wizard';
+export * from './remove_groups.wizard';

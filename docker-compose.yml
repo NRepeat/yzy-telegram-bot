@@ -1,0 +1,52 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: yzy-bot-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-user}
+      POSTGRES_PASSWORD: ${DATABASE_PASS:-password}
+      POSTGRES_DB: ${DATABASE_NAME:-yzy-bot}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-user} -d ${DATABASE_NAME:-yzy-bot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      labels:
+        - "image-name=yzy-bot"
+    container_name: yzy-bot-app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://${DATABASE_USER:-user}:${DATABASE_PASS:-password}@db:${DATABASE_PORT:-5432}/${DATABASE_NAME:-yzy-bot}?schema=public"
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL}
+      ADMIN_KEY: ${ADMIN_KEY}
+      NODE_ENV: production
+    env_file:
+      - .env
+    # command: sh -c "npm run setup"
+
+  nginx:
+    build:
+      context: ./nginx
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:

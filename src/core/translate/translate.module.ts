@@ -11,27 +11,27 @@ import { TranslateService } from './translate.service';
 @Module({
   imports: [
     I18nModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
-        fallbackLanguage: config.get<string>('FALLBACK_LANGUAGE') || '',
-        fallbacks: {
-          'en-*': 'en',
-          'ru-*': 'ru',
-        },
-        loaderOptions: {
-          // path: join(__dirname, '../libs/locales/'),
-          path: 'src/core/libs/locales',
-          watch: true,
-          includeSubfolders: true,
-        },
-        typesOutputPath: 'src/shared/types/translate.types.generated.ts',
-        // typesOutputPath: join(
-        //   __dirname,
-        //   '../libs/shared/types/translate.types.generated.ts',
-        // ),
-        catch(onrejected) {
-          throw new NotFoundException(onrejected);
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const isProduction = config.get('NODE_ENV') === 'production';
+        return {
+          fallbackLanguage: config.get<string>('FALLBACK_LANGUAGE') || 'ru',
+          fallbacks: {
+            'en-*': 'en',
+            'ru-*': 'ru',
+          },
+          loaderOptions: {
+            path: join(__dirname, '../../../libs/locales'),
+            watch: !isProduction,
+            includeSubfolders: true,
+          },
+          typesOutputPath: isProduction
+            ? undefined
+            : 'src/shared/types/translate.types.generated.ts',
+          catch(onrejected) {
+            throw new NotFoundException(onrejected);
+          },
+        };
+      },
       loader: I18nJsonLoader,
       inject: [ConfigService],
       resolvers: [

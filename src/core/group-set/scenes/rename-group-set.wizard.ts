@@ -1,15 +1,9 @@
 import { Action, Ctx, On, Wizard, WizardStep } from 'nestjs-telegraf';
 import { ExtraService } from '../../extra/extra.service';
 import { GroupSetService } from '../group-set.service';
-import type { IContext, ISceneContextScene } from 'src/shared/interfaces';
 import type { I18nPath } from 'src/shared/types/translate.types.generated';
-import { Scenes as TelegrafScenes } from 'telegraf';
-
-// Local type for wizard context
-type WizardCtx = IContext & {
-  scene: ISceneContextScene<WizardCtx>;
-  wizard: TelegrafScenes.WizardContextWizard<WizardCtx>;
-};
+import { Markup } from 'telegraf';
+import type { WizardCtx } from 'src/shared/interfaces/wizard';
 
 @Wizard('scenes.group_set_manager.rename_set')
 export class RenameGroupSetWizard {
@@ -40,21 +34,18 @@ export class RenameGroupSetWizard {
     }
 
     await this.extra.replyOrEdit(ctx, lang, {
-      text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath, // Needs localization
-      args: { currentName: selectedGroupSet.name },
-      ...this.extra.typedInlineKeyboard(
+      text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath,
+      args: { currentName: selectedGroupSet.groupSet?.name },
+      ...Markup.inlineKeyboard([
         [
-          [
-            {
-              text: 'buttons.cancel' as I18nPath,
-              callback_data: 'cancel_rename_set',
-            },
-          ],
+          Markup.button.callback(
+            'buttons.cancel' as I18nPath,
+            'cancel_rename_set',
+          ),
         ],
-        lang,
-      ),
+      ]),
     });
-    ctx.wizard.next(); // Move to the next step to receive the new name
+    ctx.wizard.next();
   }
 
   @On('text')
@@ -75,18 +66,17 @@ export class RenameGroupSetWizard {
       await this.extra.replyOrEdit(ctx, lang, {
         text: 'phrases.group_set_manager.rename_set_prompt' as I18nPath, // Re-prompt if name is empty
       });
-      return; // Stay on the same step
+      return;
     }
 
     try {
-      // Check if a group set with this newName already exists (excluding the current set)
       const existingGroupSet =
         await this.groupSetService.getGroupSetByName(newName);
       if (existingGroupSet && existingGroupSet.id !== setId) {
         await this.extra.replyOrEdit(ctx, lang, {
           text: 'phrases.group_set_manager.set_name_exists' as I18nPath,
         });
-        return; // Stay on the same step
+        return;
       }
 
       const updatedSet = await this.groupSetService.updateGroupSetName(
