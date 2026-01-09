@@ -140,9 +140,11 @@ export class ManageGroupSetScene {
 
   @ActionContract('remove_group_from_set')
   async onRemoveGroupFromSet(@Ctx() ctx: IContext) {
-    await ctx.reply('Remove group from set functionality to be implemented.');
-    return ctx.scene.reenter();
+    const setId = ctx.session.groupSet?.selectedGroupSetId;
+    if (!setId) return ctx.scene.enter('scenes.group_set_manager.list');
 
+    // Переходим в специальную сцену удаления
+    return await ctx.scene.enter('scenes.group_set_manager.remove_groups');
   }
 
   @ActionContract('back_to_list')

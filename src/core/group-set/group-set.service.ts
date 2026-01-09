@@ -58,12 +58,15 @@ export class GroupSetService {
       },
     });
   }
-
-  async removeGroupFromSet(setId: number, chat_id: bigint): Promise<void> {
-    await this.prisma.groupSetItem.deleteMany({
-      where: {
-        setId,
-        chat_id,
+  async removeGroupFromSet(setId: number, chatId: bigint) {
+    return await this.prisma.groupSet.update({
+      where: { id: setId },
+      data: {
+        items: {
+          deleteMany: {
+            chat_id: chatId,
+          },
+        },
       },
     });
   }
