@@ -1,4 +1,4 @@
-import { Start, Update } from 'nestjs-telegraf';
+import { Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { SessionService } from 'src/core/session';
 import type { IContext } from 'src/shared/interfaces';
 import { GroupService } from 'src/core/group/group.service';
@@ -13,7 +13,16 @@ export class BotUpdate {
     private readonly adminService: AdminService,
     private readonly extra: ExtraService,
   ) {}
-
+  // @On('message')
+  // async onAnyMessage(@Ctx() ctx: IContext) {
+  //   const message = ctx.message as any;
+  //   console.log('--- НОВОЕ СООБЩЕНИЕ ---');
+  //   console.log('Text:', message?.text);
+  //   console.log('Chat ID:', ctx.chat?.id);
+  //   console.log('Current Scene:', ctx.scene?.current?.id);
+  //   console.log('Step:', (ctx as any).wizard?.cursor); // Если вы внутри визарда
+  //   console.log('------------------------');
+  // }
   @Start()
   async start(ctx: IContext) {
     this.sessionService.resetBotSession(ctx);

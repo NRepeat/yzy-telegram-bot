@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectBot } from 'nestjs-telegraf';
 import { IContext } from 'src/shared/interfaces/context.abstract';
-import { type IBotContext } from 'src/shared/interfaces/context.bot';
+import type { IBotContext } from 'src/shared/interfaces/context.bot';
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from 'telegraf/types';
 
 @Injectable()

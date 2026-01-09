@@ -209,6 +209,7 @@ export type GroupSetItemWhereInput = {
   setId?: Prisma.IntFilter<"GroupSetItem"> | number
   chat_id?: Prisma.BigIntFilter<"GroupSetItem"> | bigint | number
   set?: Prisma.XOR<Prisma.GroupSetScalarRelationFilter, Prisma.GroupSetWhereInput>
+  chat?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
 }
 
 export type GroupSetItemOrderByWithRelationInput = {
@@ -216,6 +217,7 @@ export type GroupSetItemOrderByWithRelationInput = {
   setId?: Prisma.SortOrder
   chat_id?: Prisma.SortOrder
   set?: Prisma.GroupSetOrderByWithRelationInput
+  chat?: Prisma.GroupOrderByWithRelationInput
 }
 
 export type GroupSetItemWhereUniqueInput = Prisma.AtLeast<{
@@ -226,6 +228,7 @@ export type GroupSetItemWhereUniqueInput = Prisma.AtLeast<{
   setId?: Prisma.IntFilter<"GroupSetItem"> | number
   chat_id?: Prisma.BigIntFilter<"GroupSetItem"> | bigint | number
   set?: Prisma.XOR<Prisma.GroupSetScalarRelationFilter, Prisma.GroupSetWhereInput>
+  chat?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
 }, "id">
 
 export type GroupSetItemOrderByWithAggregationInput = {
@@ -249,8 +252,8 @@ export type GroupSetItemScalarWhereWithAggregatesInput = {
 }
 
 export type GroupSetItemCreateInput = {
-  chat_id: bigint | number
   set: Prisma.GroupSetCreateNestedOneWithoutItemsInput
+  chat: Prisma.GroupCreateNestedOneWithoutGroupSetItemsInput
 }
 
 export type GroupSetItemUncheckedCreateInput = {
@@ -260,8 +263,8 @@ export type GroupSetItemUncheckedCreateInput = {
 }
 
 export type GroupSetItemUpdateInput = {
-  chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   set?: Prisma.GroupSetUpdateOneRequiredWithoutItemsNestedInput
+  chat?: Prisma.GroupUpdateOneRequiredWithoutGroupSetItemsNestedInput
 }
 
 export type GroupSetItemUncheckedUpdateInput = {
@@ -277,7 +280,7 @@ export type GroupSetItemCreateManyInput = {
 }
 
 export type GroupSetItemUpdateManyMutationInput = {
-  chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+
 }
 
 export type GroupSetItemUncheckedUpdateManyInput = {
@@ -326,6 +329,48 @@ export type GroupSetItemSumOrderByAggregateInput = {
   chat_id?: Prisma.SortOrder
 }
 
+export type GroupSetItemCreateNestedManyWithoutChatInput = {
+  create?: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput> | Prisma.GroupSetItemCreateWithoutChatInput[] | Prisma.GroupSetItemUncheckedCreateWithoutChatInput[]
+  connectOrCreate?: Prisma.GroupSetItemCreateOrConnectWithoutChatInput | Prisma.GroupSetItemCreateOrConnectWithoutChatInput[]
+  createMany?: Prisma.GroupSetItemCreateManyChatInputEnvelope
+  connect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+}
+
+export type GroupSetItemUncheckedCreateNestedManyWithoutChatInput = {
+  create?: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput> | Prisma.GroupSetItemCreateWithoutChatInput[] | Prisma.GroupSetItemUncheckedCreateWithoutChatInput[]
+  connectOrCreate?: Prisma.GroupSetItemCreateOrConnectWithoutChatInput | Prisma.GroupSetItemCreateOrConnectWithoutChatInput[]
+  createMany?: Prisma.GroupSetItemCreateManyChatInputEnvelope
+  connect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+}
+
+export type GroupSetItemUpdateManyWithoutChatNestedInput = {
+  create?: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput> | Prisma.GroupSetItemCreateWithoutChatInput[] | Prisma.GroupSetItemUncheckedCreateWithoutChatInput[]
+  connectOrCreate?: Prisma.GroupSetItemCreateOrConnectWithoutChatInput | Prisma.GroupSetItemCreateOrConnectWithoutChatInput[]
+  upsert?: Prisma.GroupSetItemUpsertWithWhereUniqueWithoutChatInput | Prisma.GroupSetItemUpsertWithWhereUniqueWithoutChatInput[]
+  createMany?: Prisma.GroupSetItemCreateManyChatInputEnvelope
+  set?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  disconnect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  delete?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  connect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  update?: Prisma.GroupSetItemUpdateWithWhereUniqueWithoutChatInput | Prisma.GroupSetItemUpdateWithWhereUniqueWithoutChatInput[]
+  updateMany?: Prisma.GroupSetItemUpdateManyWithWhereWithoutChatInput | Prisma.GroupSetItemUpdateManyWithWhereWithoutChatInput[]
+  deleteMany?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
+}
+
+export type GroupSetItemUncheckedUpdateManyWithoutChatNestedInput = {
+  create?: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput> | Prisma.GroupSetItemCreateWithoutChatInput[] | Prisma.GroupSetItemUncheckedCreateWithoutChatInput[]
+  connectOrCreate?: Prisma.GroupSetItemCreateOrConnectWithoutChatInput | Prisma.GroupSetItemCreateOrConnectWithoutChatInput[]
+  upsert?: Prisma.GroupSetItemUpsertWithWhereUniqueWithoutChatInput | Prisma.GroupSetItemUpsertWithWhereUniqueWithoutChatInput[]
+  createMany?: Prisma.GroupSetItemCreateManyChatInputEnvelope
+  set?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  disconnect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  delete?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  connect?: Prisma.GroupSetItemWhereUniqueInput | Prisma.GroupSetItemWhereUniqueInput[]
+  update?: Prisma.GroupSetItemUpdateWithWhereUniqueWithoutChatInput | Prisma.GroupSetItemUpdateWithWhereUniqueWithoutChatInput[]
+  updateMany?: Prisma.GroupSetItemUpdateManyWithWhereWithoutChatInput | Prisma.GroupSetItemUpdateManyWithWhereWithoutChatInput[]
+  deleteMany?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
+}
+
 export type GroupSetItemCreateNestedManyWithoutSetInput = {
   create?: Prisma.XOR<Prisma.GroupSetItemCreateWithoutSetInput, Prisma.GroupSetItemUncheckedCreateWithoutSetInput> | Prisma.GroupSetItemCreateWithoutSetInput[] | Prisma.GroupSetItemUncheckedCreateWithoutSetInput[]
   connectOrCreate?: Prisma.GroupSetItemCreateOrConnectWithoutSetInput | Prisma.GroupSetItemCreateOrConnectWithoutSetInput[]
@@ -368,8 +413,52 @@ export type GroupSetItemUncheckedUpdateManyWithoutSetNestedInput = {
   deleteMany?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
 }
 
+export type GroupSetItemCreateWithoutChatInput = {
+  set: Prisma.GroupSetCreateNestedOneWithoutItemsInput
+}
+
+export type GroupSetItemUncheckedCreateWithoutChatInput = {
+  id?: number
+  setId: number
+}
+
+export type GroupSetItemCreateOrConnectWithoutChatInput = {
+  where: Prisma.GroupSetItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput>
+}
+
+export type GroupSetItemCreateManyChatInputEnvelope = {
+  data: Prisma.GroupSetItemCreateManyChatInput | Prisma.GroupSetItemCreateManyChatInput[]
+  skipDuplicates?: boolean
+}
+
+export type GroupSetItemUpsertWithWhereUniqueWithoutChatInput = {
+  where: Prisma.GroupSetItemWhereUniqueInput
+  update: Prisma.XOR<Prisma.GroupSetItemUpdateWithoutChatInput, Prisma.GroupSetItemUncheckedUpdateWithoutChatInput>
+  create: Prisma.XOR<Prisma.GroupSetItemCreateWithoutChatInput, Prisma.GroupSetItemUncheckedCreateWithoutChatInput>
+}
+
+export type GroupSetItemUpdateWithWhereUniqueWithoutChatInput = {
+  where: Prisma.GroupSetItemWhereUniqueInput
+  data: Prisma.XOR<Prisma.GroupSetItemUpdateWithoutChatInput, Prisma.GroupSetItemUncheckedUpdateWithoutChatInput>
+}
+
+export type GroupSetItemUpdateManyWithWhereWithoutChatInput = {
+  where: Prisma.GroupSetItemScalarWhereInput
+  data: Prisma.XOR<Prisma.GroupSetItemUpdateManyMutationInput, Prisma.GroupSetItemUncheckedUpdateManyWithoutChatInput>
+}
+
+export type GroupSetItemScalarWhereInput = {
+  AND?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
+  OR?: Prisma.GroupSetItemScalarWhereInput[]
+  NOT?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
+  id?: Prisma.IntFilter<"GroupSetItem"> | number
+  setId?: Prisma.IntFilter<"GroupSetItem"> | number
+  chat_id?: Prisma.BigIntFilter<"GroupSetItem"> | bigint | number
+}
+
 export type GroupSetItemCreateWithoutSetInput = {
-  chat_id: bigint | number
+  chat: Prisma.GroupCreateNestedOneWithoutGroupSetItemsInput
 }
 
 export type GroupSetItemUncheckedCreateWithoutSetInput = {
@@ -403,13 +492,23 @@ export type GroupSetItemUpdateManyWithWhereWithoutSetInput = {
   data: Prisma.XOR<Prisma.GroupSetItemUpdateManyMutationInput, Prisma.GroupSetItemUncheckedUpdateManyWithoutSetInput>
 }
 
-export type GroupSetItemScalarWhereInput = {
-  AND?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
-  OR?: Prisma.GroupSetItemScalarWhereInput[]
-  NOT?: Prisma.GroupSetItemScalarWhereInput | Prisma.GroupSetItemScalarWhereInput[]
-  id?: Prisma.IntFilter<"GroupSetItem"> | number
-  setId?: Prisma.IntFilter<"GroupSetItem"> | number
-  chat_id?: Prisma.BigIntFilter<"GroupSetItem"> | bigint | number
+export type GroupSetItemCreateManyChatInput = {
+  id?: number
+  setId: number
+}
+
+export type GroupSetItemUpdateWithoutChatInput = {
+  set?: Prisma.GroupSetUpdateOneRequiredWithoutItemsNestedInput
+}
+
+export type GroupSetItemUncheckedUpdateWithoutChatInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  setId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type GroupSetItemUncheckedUpdateManyWithoutChatInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  setId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type GroupSetItemCreateManySetInput = {
@@ -418,7 +517,7 @@ export type GroupSetItemCreateManySetInput = {
 }
 
 export type GroupSetItemUpdateWithoutSetInput = {
-  chat_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  chat?: Prisma.GroupUpdateOneRequiredWithoutGroupSetItemsNestedInput
 }
 
 export type GroupSetItemUncheckedUpdateWithoutSetInput = {
@@ -438,6 +537,7 @@ export type GroupSetItemSelect<ExtArgs extends runtime.Types.Extensions.Internal
   setId?: boolean
   chat_id?: boolean
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["groupSetItem"]>
 
 export type GroupSetItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -445,6 +545,7 @@ export type GroupSetItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   setId?: boolean
   chat_id?: boolean
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["groupSetItem"]>
 
 export type GroupSetItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -452,6 +553,7 @@ export type GroupSetItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   setId?: boolean
   chat_id?: boolean
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["groupSetItem"]>
 
 export type GroupSetItemSelectScalar = {
@@ -463,18 +565,22 @@ export type GroupSetItemSelectScalar = {
 export type GroupSetItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "setId" | "chat_id", ExtArgs["result"]["groupSetItem"]>
 export type GroupSetItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }
 export type GroupSetItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }
 export type GroupSetItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   set?: boolean | Prisma.GroupSetDefaultArgs<ExtArgs>
+  chat?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
 }
 
 export type $GroupSetItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "GroupSetItem"
   objects: {
     set: Prisma.$GroupSetPayload<ExtArgs>
+    chat: Prisma.$GroupPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -875,6 +981,7 @@ readonly fields: GroupSetItemFieldRefs;
 export interface Prisma__GroupSetItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   set<T extends Prisma.GroupSetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupSetDefaultArgs<ExtArgs>>): Prisma.Prisma__GroupSetClient<runtime.Types.Result.GetResult<Prisma.$GroupSetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  chat<T extends Prisma.GroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupDefaultArgs<ExtArgs>>): Prisma.Prisma__GroupClient<runtime.Types.Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
