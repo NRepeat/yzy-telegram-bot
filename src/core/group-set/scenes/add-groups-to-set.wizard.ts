@@ -64,7 +64,6 @@ export class AddGroupsToSetWizard {
         return !isPresent;
       }),
     );
-    // 3. Формируем кнопки
     const groupButtons = selectableGroupIds.map((set) => {
       const sId = set.id.toString();
 
@@ -81,7 +80,12 @@ export class AddGroupsToSetWizard {
     });
 
     const messageText = `<b>Меню рассылки</b>\n\nВыбрано групп: <b>${selectedChatIds.length}</b>\nВыберите группы из списка ниже:`;
-
+    groupButtons.push([
+      { text: 'Сохранить', callback_data: 'save_groups_to_set' },
+    ]);
+    groupButtons.push([
+      { text: '❌ Отмена', callback_data: 'cancel_add_group' },
+    ]);
     const replyMarkup = { inline_keyboard: groupButtons };
 
     if (ctx.updateType === 'callback_query' && !forceNew) {
@@ -90,9 +94,7 @@ export class AddGroupsToSetWizard {
           parse_mode: 'HTML',
           reply_markup: replyMarkup,
         });
-      } catch (e) {
-        // Игнорируем ошибку, если содержимое не изменилось
-      }
+      } catch (e) {}
     } else {
       const sentMsg = await ctx.reply(messageText, {
         parse_mode: 'HTML',
@@ -106,7 +108,6 @@ export class AddGroupsToSetWizard {
   async toggleGroup(@Ctx() ctx: WizardCtx) {
     const setId = Number((ctx.callbackQuery as any).data.split('_').pop());
     let selectedSets = ctx.scene.state.sets?.selectedSets || [];
-    console.log('Текущий выбор (IDs):', selectedSets, setId);
     if (!selectedSets || selectedSets.length === 0) {
       selectedSets = [];
     }
@@ -115,31 +116,20 @@ export class AddGroupsToSetWizard {
       where: { id: setId },
       include: { items: true },
     });
-    console.log('Загруженный сет:', groupSet);
     if (!groupSet) return ctx.answerCbQuery('Сет не найден');
 
-    const currentSelected = new Set(selectedSets.map(String));
-
-    console.log('Текущий выбор (IDs):', currentSelected);
     const isSetSelected =
       selectedSets.length > 0 && selectedSets.includes(setId.toString());
-    console.log('Выбран ли сет сейчас:', isSetSelected);
-    // 4. Переключаем (Toggle)
     if (isSetSelected) {
-      // Если уже выбран — удаляем все ID этого сета
-
       selectedSets = selectedSets.filter((id) => id !== groupSet.id.toString());
     } else {
       const uniqueSet = new Set([...selectedSets, groupSet.id.toString()]);
       selectedSets = Array.from(uniqueSet);
     }
 
-    // 5. Записываем обратно в стейт сцены как массив строк
     if (ctx.scene.state.sets?.selectedSets) {
       ctx.scene.state.sets.selectedSets = Array.from(selectedSets);
     }
-    // Для отладки
-    console.log('Текущий выбор (IDs):', ctx.scene.state.sets.selectedSets);
 
     await ctx.answerCbQuery();
     await this.render(ctx);
@@ -153,10 +143,11 @@ export class AddGroupsToSetWizard {
   @Action('save_groups_to_set')
   async onSave(@Ctx() ctx: WizardCtx) {
     const selected = this.getSelected(ctx);
+    console.log('Selected:', ctx.session);
     const { groupSet: sessionGroupSet } = ctx.session;
-    const setId = sessionGroupSet?.selectedGroupSetId;
-    if (!setId) {
-      await ctx.answerCbQuery('Please select a group set.');
+    const chatIds = sessionGroupSet?.selectedChatIds;
+    if (!chatIds) {
+      await ctx.answerCbQuery('Please select a group .');
       return;
     }
     if (selected.length === 0) {
@@ -166,15 +157,12 @@ export class AddGroupsToSetWizard {
 
     try {
       let addedCount = 0;
-      for (const groupId of selected) {
-        try {
-          await this.groupSetService.addGroupToSet(setId, BigInt(groupId));
-          addedCount++;
-        } catch (error: any) {
-          if (error.message?.includes('already in set')) {
-          } else {
-            throw error; // Rethrow other errors
-          }
+      for (const groupId of chatIds) {
+        for (const setID of selected) {
+          await this.groupSetService.addGroupToSet(
+            Number(setID),
+            BigInt(groupId),
+          );
         }
       }
 
@@ -190,12 +178,12 @@ export class AddGroupsToSetWizard {
         text: 'phrases.group_set_manager.add_groups_error' as I18nPath,
       });
     } finally {
-      await ctx.scene.enter('scenes.group_set_manager.manage_selected');
+      await ctx.scene.enter('scenes.groups');
     }
   }
 
   @Action('cancel_add_group')
   async onCancel(@Ctx() ctx: WizardCtx) {
-    await ctx.scene.enter('scenes.group_set_manager.manage_selected');
+    await ctx.scene.enter('scenes.groups');
   }
 }
