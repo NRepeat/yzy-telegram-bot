@@ -69,11 +69,12 @@ export class ManageGroupSetScene {
     keyboard.push([
       { text: 'buttons.back' as I18nPath, callback_data: 'back_to_list' },
     ]);
-    await this.extra.replyOrEdit(ctx, lang, {
+    const message = await this.extra.replyOrEdit(ctx, lang, {
       text: 'phrases.group_set_manager.manage_set_welcome' as I18nPath, // Needs localization
       args: { setName: selectedGroupSet.groupSet?.name, groups: groupNames },
       ...this.extra.typedInlineKeyboard(keyboard, lang),
     });
+    ctx.scene.state.lastMenuId = message.message_id;
   }
   @Action('send')
   async send(@Ctx() ctx: IContext) {
@@ -120,14 +121,26 @@ export class ManageGroupSetScene {
     }
 
     await ctx.reply(`✅ Рассылка в ${groupIds.groups.length} групп завершена!`);
-
+    if (ctx.scene.state.lastMenuId) {
+      try {
+        if (ctx.chat?.id) {
+          await ctx.telegram.deleteMessage(
+            ctx.chat?.id,
+            ctx.scene.state.lastMenuId,
+          );
+        }
+      } catch (e) {
+        console.error('Не удалось удалить старое меню:', e);
+      }
+    }
+    ctx.scene.state.lastMenuId = undefined;
     ctx.scene.state.step = '';
     return await ctx.scene.reenter();
   }
   @ActionContract('rename_set')
   async onRenameSet(@Ctx() ctx: IContext) {
     await ctx.reply('Rename set functionality to be implemented.');
-    return ctx.scene.reenter();
+    return ctx.scene.enter('scenes.group_set_manager.rename_set');
   }
 
   @ActionContract('delete_set')
