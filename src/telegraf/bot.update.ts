@@ -40,19 +40,23 @@ export class BotUpdate {
       }
       const status = myChatMember.new_chat_member.status;
 
-      // Проверяем, был ли бот удален или покинул группу
       if (status === 'kicked' || status === 'left') {
         console.log(
           `Бот удален из ${myChatMember.chat.type}: ${myChatMember.chat.id}`,
         );
-
-        // Вызываем ваш сервис для обработки удаления (например, пометить группу как неактивную)
         if (
           myChatMember.chat.type === 'group' ||
           myChatMember.chat.type === 'supergroup'
         ) {
           // Предположим, у вас есть такой метод в GroupService
           await this.groupService.removeGroup(myChatMember.chat.id);
+        }
+      } else {
+        if (ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup') {
+          await this.groupService.upsertGroup(
+            ctx.chat.id,
+            ctx.chat.title || '',
+          );
         }
       }
     } catch (error) {
