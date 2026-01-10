@@ -13,20 +13,10 @@ export class BotUpdate {
     private readonly adminService: AdminService,
     private readonly extra: ExtraService,
   ) {}
-  // @On('message')
-  // async onAnyMessage(@Ctx() ctx: IContext) {
-  //   const message = ctx.message as any;
-  //   console.log('--- НОВОЕ СООБЩЕНИЕ ---');
-  //   console.log('Text:', message?.text);
-  //   console.log('Chat ID:', ctx.chat?.id);
-  //   console.log('Current Scene:', ctx.scene?.current?.id);
-  //   console.log('Step:', (ctx as any).wizard?.cursor); // Если вы внутри визарда
-  //   console.log('------------------------');
-  // }
+
   @Start()
   async start(ctx: IContext) {
     this.sessionService.resetBotSession(ctx);
-    console.log(ctx.chat?.type);
     if (ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup') {
       await this.groupService.upsertGroup(ctx.chat.id, ctx.chat.title || '');
     }
@@ -39,6 +29,34 @@ export class BotUpdate {
         text: 'alerts.not_admin',
         args: { name: ctx.from?.username },
       });
+    }
+  }
+  @On('my_chat_member')
+  async onMyChatMember(@Ctx() ctx: IContext) {
+    try {
+      const myChatMember = ctx.myChatMember;
+      if (!myChatMember) {
+        return;
+      }
+      const status = myChatMember.new_chat_member.status;
+
+      // Проверяем, был ли бот удален или покинул группу
+      if (status === 'kicked' || status === 'left') {
+        console.log(
+          `Бот удален из ${myChatMember.chat.type}: ${myChatMember.chat.id}`,
+        );
+
+        // Вызываем ваш сервис для обработки удаления (например, пометить группу как неактивную)
+        if (
+          myChatMember.chat.type === 'group' ||
+          myChatMember.chat.type === 'supergroup'
+        ) {
+          // Предположим, у вас есть такой метод в GroupService
+          await this.groupService.removeGroup(myChatMember.chat.id);
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при обработке my_chat_member:', error);
     }
   }
 }

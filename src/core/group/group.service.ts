@@ -5,6 +5,15 @@ import type { GroupWhereInput } from 'generated/prisma/models/Group';
 @Injectable()
 export class GroupService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async removeGroup(id: number) {
+    return this.prisma.group.delete({
+      where: {
+        chat_id: BigInt(id),
+      },
+    });
+  }
+
   async getAllGroups({ where }: { where?: GroupWhereInput }) {
     return this.prisma.group.findMany({ where });
   }

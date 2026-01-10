@@ -97,7 +97,7 @@ export class AddGroupsToSetWizard {
         reply_markup: replyMarkup,
       });
       if (ctx.scene.state.lastMenuId) {
-        ctx.scene.state.lastMenuId= sentMsg.message_id;
+        ctx.scene.state.lastMenuId = sentMsg.message_id;
       }
     }
   }

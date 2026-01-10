@@ -15,7 +15,6 @@ import { session } from 'telegraf';
 import { GroupModule } from 'src/core/group/group.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExtraModule } from 'src/core/extra';
-// import { session } from 'telegraf';
 
 const store = (config: ConfigService) => {
   return Postgres<PostgresAdapter>({
