@@ -56,7 +56,8 @@ export const ModelName = {
   GroupSet: 'GroupSet',
   GroupSetItem: 'GroupSetItem',
   Broadcast: 'Broadcast',
-  BroadcastMessage: 'BroadcastMessage'
+  BroadcastMessage: 'BroadcastMessage',
+  TrackedMessage: 'TrackedMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -130,6 +131,26 @@ export const BroadcastMessageScalarFieldEnum = {
 export type BroadcastMessageScalarFieldEnum = (typeof BroadcastMessageScalarFieldEnum)[keyof typeof BroadcastMessageScalarFieldEnum]
 
 
+export const TrackedMessageScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  user_id: 'user_id',
+  chat_id: 'chat_id',
+  chat_title: 'chat_title',
+  message_id: 'message_id',
+  text: 'text',
+  sent_at: 'sent_at',
+  reply_to_message_id: 'reply_to_message_id',
+  reply_to_username: 'reply_to_username',
+  reply_to_text: 'reply_to_text',
+  reply_to_sent_at: 'reply_to_sent_at',
+  response_seconds: 'response_seconds',
+  created_at: 'created_at'
+} as const
+
+export type TrackedMessageScalarFieldEnum = (typeof TrackedMessageScalarFieldEnum)[keyof typeof TrackedMessageScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -144,4 +165,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

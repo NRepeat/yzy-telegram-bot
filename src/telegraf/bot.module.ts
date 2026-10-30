@@ -15,6 +15,7 @@ import { session } from 'telegraf';
 import { GroupModule } from 'src/core/group/group.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExtraModule } from 'src/core/extra';
+import { parseUsernames, trackerMiddleware } from 'src/core/tracker/tracker';
 
 const store = (config: ConfigService) => {
   return Postgres<PostgresAdapter>({
@@ -38,7 +39,13 @@ const store = (config: ConfigService) => {
       useFactory: (config: ConfigService) => {
         return {
           token: config.get<string>('TELEGRAM_BOT_TOKEN') || '',
-          middlewares: [session({ store: store(config) })],
+          middlewares: [
+            trackerMiddleware(
+              new PrismaService(),
+              parseUsernames(config.get<string>('TRACKED_USERNAMES')),
+            ),
+            session({ store: store(config) }),
+          ],
           include: [BotModule],
           launchOptions: {
             webhook: {

@@ -389,7 +389,8 @@ export const ModelName = {
   GroupSet: 'GroupSet',
   GroupSetItem: 'GroupSetItem',
   Broadcast: 'Broadcast',
-  BroadcastMessage: 'BroadcastMessage'
+  BroadcastMessage: 'BroadcastMessage',
+  TrackedMessage: 'TrackedMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "group" | "groupSet" | "groupSetItem" | "broadcast" | "broadcastMessage"
+    modelProps: "user" | "group" | "groupSet" | "groupSetItem" | "broadcast" | "broadcastMessage" | "trackedMessage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +854,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TrackedMessage: {
+      payload: Prisma.$TrackedMessagePayload<ExtArgs>
+      fields: Prisma.TrackedMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TrackedMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TrackedMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.TrackedMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TrackedMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        findMany: {
+          args: Prisma.TrackedMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>[]
+        }
+        create: {
+          args: Prisma.TrackedMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        createMany: {
+          args: Prisma.TrackedMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TrackedMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.TrackedMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        update: {
+          args: Prisma.TrackedMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.TrackedMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TrackedMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TrackedMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.TrackedMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackedMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.TrackedMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTrackedMessage>
+        }
+        groupBy: {
+          args: Prisma.TrackedMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrackedMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TrackedMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrackedMessageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -947,6 +1022,26 @@ export const BroadcastMessageScalarFieldEnum = {
 export type BroadcastMessageScalarFieldEnum = (typeof BroadcastMessageScalarFieldEnum)[keyof typeof BroadcastMessageScalarFieldEnum]
 
 
+export const TrackedMessageScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  user_id: 'user_id',
+  chat_id: 'chat_id',
+  chat_title: 'chat_title',
+  message_id: 'message_id',
+  text: 'text',
+  sent_at: 'sent_at',
+  reply_to_message_id: 'reply_to_message_id',
+  reply_to_username: 'reply_to_username',
+  reply_to_text: 'reply_to_text',
+  reply_to_sent_at: 'reply_to_sent_at',
+  response_seconds: 'response_seconds',
+  created_at: 'created_at'
+} as const
+
+export type TrackedMessageScalarFieldEnum = (typeof TrackedMessageScalarFieldEnum)[keyof typeof TrackedMessageScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -961,6 +1056,14 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -1146,6 +1249,7 @@ export type GlobalOmitConfig = {
   groupSetItem?: Prisma.GroupSetItemOmit
   broadcast?: Prisma.BroadcastOmit
   broadcastMessage?: Prisma.BroadcastMessageOmit
+  trackedMessage?: Prisma.TrackedMessageOmit
 }
 
 /* Types for Logging */

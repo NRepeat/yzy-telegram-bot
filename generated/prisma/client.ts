@@ -67,3 +67,8 @@ export type Broadcast = Prisma.BroadcastModel
  * 
  */
 export type BroadcastMessage = Prisma.BroadcastMessageModel
+/**
+ * Model TrackedMessage
+ * 
+ */
+export type TrackedMessage = Prisma.TrackedMessageModel

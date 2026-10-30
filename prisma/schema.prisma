@@ -53,3 +53,24 @@ model BroadcastMessage {
   chat_id     BigInt
   message_id  Int
 }
+
+// Сообщения отслеживаемых аккаунтов (TRACKED_USERNAMES) и время их ответа
+model TrackedMessage {
+  id                  Int       @id @default(autoincrement())
+  username            String
+  user_id             BigInt
+  chat_id             BigInt
+  chat_title          String?
+  message_id          Int
+  text                String?
+  sent_at             DateTime
+  reply_to_message_id Int?
+  reply_to_username   String?
+  reply_to_text       String?
+  reply_to_sent_at    DateTime?
+  response_seconds    Int?
+  created_at          DateTime  @default(now())
+
+  @@unique([chat_id, message_id])
+  @@index([username, sent_at])
+}
