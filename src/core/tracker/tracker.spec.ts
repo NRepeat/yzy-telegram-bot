@@ -33,13 +33,19 @@ describe('toTrackedMessage', () => {
     });
   });
 
-  it('пропускает чужие сообщения', () => {
-    const msg = {
-      message_id: 3,
-      date: 1,
-      chat,
-      from: { id: 5, username: 'other' },
-    };
-    expect(toTrackedMessage(msg as any, users)).toBeNull();
+  it('сохраняет любое сообщение в группе', () => {
+    const msg = { message_id: 3, date: 1, chat, from: { id: 5 }, text: 'x' };
+    expect(toTrackedMessage(msg as any, users)).toMatchObject({
+      username: '',
+      text: 'x',
+    });
+  });
+
+  it('в личке сохраняет только отслеживаемых', () => {
+    const dm = { id: 5, type: 'private' };
+    const other = { message_id: 4, date: 1, chat: dm, from: { id: 5 } };
+    const tracked = { ...other, from: { id: 7, username: 'Acc3_R' } };
+    expect(toTrackedMessage(other as any, users)).toBeNull();
+    expect(toTrackedMessage(tracked as any, users)).not.toBeNull();
   });
 });

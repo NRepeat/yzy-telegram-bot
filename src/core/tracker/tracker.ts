@@ -13,25 +13,33 @@ const textOf = (msg: AnyMessage) => msg.text ?? msg.caption ?? null;
 
 export const parseUsernames = (raw?: string) =>
   new Set(
-    (raw || 'Acc2_N,Acc3_R')
+    (raw || 'Acc2_N,Acc3_R,Acc5_C')
       .split(',')
       .map((u) => u.trim().replace(/^@/, '').toLowerCase())
       .filter(Boolean),
   );
 
-/** Сообщение отслеживаемого аккаунта → строка TrackedMessage, иначе null. */
+/**
+ * Любое сообщение в группе или сообщение отслеживаемого аккаунта в любом чате
+ * → строка TrackedMessage, иначе null. Сообщения всей группы нужны, чтобы
+ * считать время ответа и без reply: от последней заявки до ответа аккаунта.
+ */
 export function toTrackedMessage(
   msg: AnyMessage | undefined,
   usernames: Set<string>,
 ): TrackedMessageCreateInput | null {
-  const username = msg?.from?.username;
-  if (!msg || !username || !usernames.has(username.toLowerCase())) {
+  if (!msg?.from) {
+    return null;
+  }
+  const username = msg.from.username ?? '';
+  const inGroup = msg.chat.type === 'group' || msg.chat.type === 'supergroup';
+  if (!inGroup && !usernames.has(username.toLowerCase())) {
     return null;
   }
   const reply = msg.reply_to_message;
   return {
     username,
-    user_id: BigInt(msg.from!.id),
+    user_id: BigInt(msg.from.id),
     chat_id: BigInt(msg.chat.id),
     chat_title: 'title' in msg.chat ? msg.chat.title : null,
     message_id: msg.message_id,
@@ -45,7 +53,7 @@ export function toTrackedMessage(
   };
 }
 
-/** Пишет сообщения TRACKED_USERNAMES в базу и всегда пропускает апдейт дальше. */
+/** Пишет сообщения в TrackedMessage и всегда пропускает апдейт дальше. */
 export function trackerMiddleware(
   prisma: PrismaService,
   usernames: Set<string>,
