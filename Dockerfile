@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml tsconfig.json ./
 
 # Install pnpm and dependencies
-RUN npm install -g pnpm && pnpm install
+# pnpm 11 падает на неподтверждённых build-скриптах (ERR_PNPM_IGNORED_BUILDS)
+RUN npm install -g pnpm@10 && pnpm install
 
 # Copy source code
 COPY . .
